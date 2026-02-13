@@ -41,7 +41,15 @@ const Sidebar = ({ role }) => {
     switch (role) {
       case 'lawyer': return [{ name: 'My Cases', path: '/lawyer', icon: Briefcase }];
       case 'ngo': return [{ name: 'Impact Dashboard', path: '/ngo', icon: Building2 }];
-      case 'citizen': return [{ name: 'My Requests', path: '/citizen', icon: User }];
+      case 'citizen':
+        return [
+          { name: 'Profile Management', path: '/citizen/profile', icon: User },
+          { name: 'Case Submission', path: '/citizen/cases', icon: FolderOpen },
+          { name: 'Directory', path: '/citizen/directory', icon: Search },
+          { name: 'Matches', path: '/citizen/matches', icon: Shield },
+          { name: 'Impact Dashboard', path: '/citizen/impact', icon: BarChart },
+          { name: 'Admin Panel', path: '/admin', icon: Settings },
+        ];
       default: return [];
     }
   };

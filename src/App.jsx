@@ -25,6 +25,11 @@ function App() {
         {/* Citizen Routes */}
         <Route path="/citizen" element={<DashboardLayout role="citizen" />}>
           <Route index element={<CitizenDashboard />} />
+          <Route path="profile" element={<div className="p-8">Profile Management (Placeholder)</div>} />
+          <Route path="cases" element={<div className="p-8">Case Submission (Placeholder)</div>} />
+          <Route path="directory" element={<div className="p-8">Directory (Placeholder)</div>} />
+          <Route path="matches" element={<div className="p-8">Matches (Placeholder)</div>} />
+          <Route path="impact" element={<div className="p-8">Impact Dashboard (Placeholder)</div>} />
         </Route>
 
         {/* NGO Routes */}
