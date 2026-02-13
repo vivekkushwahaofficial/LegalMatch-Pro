@@ -1,16 +1,85 @@
-# React + Vite
+# LegalMatch Pro - Role-Based Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive dashboard application built with **React**, **Vite**, and **Tailwind CSS**. This project features role-based access control with distinct layouts and content for Citizens, Lawyers, NGOs, and Administrators.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Role-Based Views**: dedicated dashboards for:
+  - **Citizen**: Manage requests, view matches, and directory.
+  - **Lawyer**: Case management and profile settings.
+  - **NGO**: Impact tracking and project management.
+  - **Admin**: comprehensive validation queue, system logs, and user management.
+- **Responsive Design**: Mobile-friendly sidebar and layouts using Tailwind CSS.
+- **Modern UI**: Clean, light-themed interface inspired by professional legal platforms.
+- **Routing**: Client-side routing with `react-router-dom`.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend Framework**: [React](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Routing**: [React Router DOM](https://reactrouter.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Expanding the ESLint configuration
+## 📦 Installation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1.  **Clone the repository** (if applicable) or navigate to the project directory:
+    ```bash
+    cd Dashboards
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+## ▶️ Usage
+
+### Development Server
+Run the app in development mode with hot reloading:
+```bash
+npm run dev
+# or
+npm start
+```
+Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+
+### Build for Production
+Build the app for production to the `dist` folder:
+```bash
+npm run build
+```
+
+### Preview Production Build
+Locally preview the production build:
+```bash
+npm run preview
+```
+
+## 📂 Project Structure
+
+```
+src/
+├── components/       # Reusable UI components
+│   └── Sidebar.jsx   # Role-based navigation sidebar
+├── layouts/          # Layout wrappers
+│   └── DashboardLayout.jsx
+├── pages/            # Page components for each route
+│   ├── AdminDashboard.jsx
+│   ├── CitizenDashboard.jsx
+│   ├── LawyerDashboard.jsx
+│   └── NGODashboard.jsx
+├── App.jsx           # Main application component & routing
+├── main.jsx          # Application entry point
+└── index.css         # Global styles & Tailwind imports
+```
+
+## 🔐 Access Control
+
+The application currently simulates role-based access via URL paths:
+- `/citizen` - Citizen Dashboard
+- `/lawyer` - Lawyer Dashboard
+- `/ngo` - NGO Dashboard
+- `/admin` - Admin Panel
+
+*Note: Authentication is currently mocked for demonstration purposes.*
