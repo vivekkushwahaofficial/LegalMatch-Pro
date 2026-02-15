@@ -1,4 +1,4 @@
-package com.legalmatch.backend.model;
+package com.legalmatch.backend.entity;
 
 public enum Role {
     CITIZEN,

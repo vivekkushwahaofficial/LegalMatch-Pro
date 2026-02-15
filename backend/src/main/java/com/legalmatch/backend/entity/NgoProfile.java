@@ -3,15 +3,15 @@ package com.legalmatch.backend.entity;
 import jakarta.persistence.*;
 
 @Entity
-public class LawyerProfile {
+public class NgoProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String specialization;
+    private String organizationName;
 
-    private String licenseNumber;
+    private String registrationNumber;
 
     @OneToOne
     @JoinColumn(name = "user_id")
