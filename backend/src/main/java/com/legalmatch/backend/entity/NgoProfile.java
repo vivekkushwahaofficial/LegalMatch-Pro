@@ -2,7 +2,10 @@ package com.legalmatch.backend.entity;
 
 import jakarta.persistence.*;
 
+import javax.swing.*;
+
 @Entity
+@Table(name = "ngo_profiles")
 public class NgoProfile {
 
     @Id

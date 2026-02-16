@@ -3,6 +3,7 @@ package com.legalmatch.backend.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "lawyer_profiles")
 public class LawyerProfile {
 
     @Id
