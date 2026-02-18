@@ -20,5 +20,11 @@ public class NgoProfile {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public void setNgoName(String ngoName) {
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+    }
+
     // getters and setters
 }

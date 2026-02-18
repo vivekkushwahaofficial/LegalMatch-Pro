@@ -1,7 +1,11 @@
 package com.legalmatch.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -11,14 +15,18 @@ public class User {
     private Long id;
 
     private String name;
-
-    @Column(unique = true)
     private String email;
-
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // getters and setters
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private LawyerProfile lawyerProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private NgoProfile ngoProfile;
+
 }
+

@@ -15,8 +15,14 @@ public class LawyerProfile {
     private String licenseNumber;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
+
+    public void setLicenseNumber(String licenseNumber) {
+    }
+
+    public void setSpecialization(String specialization) {
+    }
 
     // getters and setters
 }
