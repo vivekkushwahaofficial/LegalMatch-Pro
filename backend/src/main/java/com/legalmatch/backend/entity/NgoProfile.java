@@ -1,8 +1,7 @@
 package com.legalmatch.backend.entity;
 
 import jakarta.persistence.*;
-
-import javax.swing.*;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ngo_profiles")
@@ -14,17 +13,32 @@ public class NgoProfile {
 
     private String organizationName;
 
+    @Setter
     private String registrationNumber;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    // ✅ Proper setter for NGO name
     public void setNgoName(String ngoName) {
+        this.organizationName = ngoName;
     }
 
-    public void setRegistrationNumber(String registrationNumber) {
+    // ✅ Optional getters (good practice)
+    public Long getId() {
+        return id;
     }
 
-    // getters and setters
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

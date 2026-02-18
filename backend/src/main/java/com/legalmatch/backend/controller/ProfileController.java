@@ -67,14 +67,17 @@ public class ProfileController {
 
         if (user.getRole().name().equals("NGO")) {
             if (user.getNgoProfile() != null) {
+
                 if (request.getNgoName() != null) {
                     user.getNgoProfile().setNgoName(request.getNgoName());
                 }
+
                 if (request.getRegistrationNumber() != null) {
                     user.getNgoProfile().setRegistrationNumber(request.getRegistrationNumber());
                 }
             }
         }
+
 
         // 5. Save updated user
         userRepository.save(user);
