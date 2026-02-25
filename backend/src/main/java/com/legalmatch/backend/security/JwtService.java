@@ -27,7 +27,7 @@ public class JwtService {
                 .setClaims(claims)                          // put custom data
                 .setSubject(email)                          // email as subject
                 .setIssuedAt(new Date())                    // token create time
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 min expiry
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60))  // 1 hour expiry
                 .signWith(key)                              // sign token with secret key
                 .compact();                                 // build token
     }
@@ -36,7 +36,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24)) //24 hours expiry
                 .signWith(key)
                 .compact();
     }
