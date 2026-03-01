@@ -90,6 +90,7 @@ public class ProfileController {
         response.setRole(user.getRole().name());
 
         return response;
+
     }
 
 }
