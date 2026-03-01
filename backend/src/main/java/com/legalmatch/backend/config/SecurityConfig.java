@@ -35,12 +35,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")     // 👈 only admin
                         .requestMatchers("/api/profile/**").authenticated()
-<<<<<<< HEAD
-                        .anyRequest().authenticated()
-=======
+                                .anyRequest().authenticated()
                         .requestMatchers("/api/cases/**").authenticated()
                         .anyRequest().permitAll()
->>>>>>> e4008f3c4fa736f22fc426bf9ae4777d7300e1b0
+
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
