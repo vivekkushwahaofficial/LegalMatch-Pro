@@ -10,4 +10,6 @@ import java.util.List;
 public interface CaseRepository extends JpaRepository<Case, Long> {
 
     List<Case> findByUser(User user);
+
+    Iterable<Case> findByStatus(String status);
 }

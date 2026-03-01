@@ -2,8 +2,12 @@ package com.legalmatch.backend.controller;
 
 import com.legalmatch.backend.dto.LoginRequest;
 import com.legalmatch.backend.dto.RegisterRequest;
+import com.legalmatch.backend.entity.LawyerProfile;
+import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.repository.LawyerProfileRepository;
+import com.legalmatch.backend.repository.NgoProfileRepository;
 import com.legalmatch.backend.repository.UserRepository;
 import com.legalmatch.backend.security.JwtService;
 import jakarta.validation.Valid;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -22,8 +27,10 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final LawyerProfileRepository lawyerProfileRepository;
+    private final NgoProfileRepository ngoProfileRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder;
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
@@ -35,27 +42,50 @@ public class AuthController {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.CITIZEN);
 
-        userRepository.save(user);
+        // ✅ Set role from frontend
+        if (request.getRole().equalsIgnoreCase("LAWYER")) {
+            user.setRole(Role.LAWYER);
+        } else if (request.getRole().equalsIgnoreCase("NGO")) {
+            user.setRole(Role.NGO);
+        } else {
+            user.setRole(Role.CITIZEN);
+        }        userRepository.save(user);
+
+       // 🔥 Cleaner approach
+        Role role = user.getRole();
+
+        if (role == Role.LAWYER) {
+            LawyerProfile profile = new LawyerProfile();
+            profile.setUser(user);
+            lawyerProfileRepository.save(profile);
+        }
+
+        if (role == Role.NGO) {
+            NgoProfile profile = new NgoProfile();
+            profile.setUser(user);
+            ngoProfileRepository.save(profile);
+        }
 
         return ResponseEntity.ok("User registered successfully");
     }
 
-
     @PostMapping("/login")
     public Map<String, String> login(@Valid @RequestBody LoginRequest request) {
 
+        // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Check password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
+        // Generate tokens
         String accessToken = jwtService.generateAccessToken(
                 user.getEmail(),
-                user.getRole().name()   // 👈 pass role into token
+                user.getRole().name()
         );
 
         String refreshToken = jwtService.generateRefreshToken(user.getEmail());
@@ -77,9 +107,13 @@ public class AuthController {
         }
 
         String email = jwtService.extractEmail(refreshToken);
-        String role = jwtService.extractRole(refreshToken);   // 👈 extract role from token
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String newAccessToken = jwtService.generateAccessToken(email, role);  // 👈 pass both
+        String newAccessToken = jwtService.generateAccessToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
 
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", newAccessToken);
