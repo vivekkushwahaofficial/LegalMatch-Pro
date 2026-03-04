@@ -1,14 +1,13 @@
 package com.legalmatch.backend.controller;
 
-import com.legalmatch.backend.entity.Lawyer;
-import com.legalmatch.backend.entity.Ngo;
-import com.legalmatch.backend.repository.LawyerRepository;
-import com.legalmatch.backend.repository.NgoRepository;
+import com.legalmatch.backend.dto.LawyerDirectoryResponse;
+import com.legalmatch.backend.dto.NgoDirectoryResponse;
+import com.legalmatch.backend.entity.LawyerProfile;
+import com.legalmatch.backend.entity.NgoProfile;
+import com.legalmatch.backend.service.DirectoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -17,26 +16,53 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectoryController {
 
-    private final LawyerRepository lawyerRepository;
-    private final NgoRepository ngoRepository;
+    private final DirectoryService directoryService;
 
     @GetMapping("/lawyers")
-    public Page<Lawyer> getLawyers(
+    public List<LawyerDirectoryResponse> getLawyers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
-            return
-    lawyerRepository.findAll(PageRequest.of(page,size));
-        }
+
+        Page<LawyerProfile> lawyers = directoryService.getLawyers(page, size);
+
+        return lawyers.getContent()
+                .stream()
+                .map(this::mapLawyer)
+                .toList();
+    }
 
     @GetMapping("/ngos")
-    public List<Ngo> getNgos(
+    public List<NgoDirectoryResponse> getNgos(
             @RequestParam(required = false) String location
     ) {
-        if (location != null) {
-            return
-    ngoRepository.findByLocationIgnoreCase(location);
-        }
-        return ngoRepository.findByVerifiedTrue();
+
+        List<NgoProfile> ngos = directoryService.getNgos(location);
+
+        return ngos.stream()
+                .map(this::mapNgo)
+                .toList();
+    }
+
+    private LawyerDirectoryResponse mapLawyer(LawyerProfile lawyer) {
+
+        LawyerDirectoryResponse dto = new LawyerDirectoryResponse();
+
+        dto.setSpecialization(lawyer.getSpecialization());
+        dto.setLocation(lawyer.getLocation());
+        dto.setVerified(lawyer.isVerified());
+
+        return dto;
+    }
+
+    private NgoDirectoryResponse mapNgo(NgoProfile ngo) {
+
+        NgoDirectoryResponse dto = new NgoDirectoryResponse();
+
+        dto.setOrganizationName(ngo.getOrganizationName());
+        dto.setLocation(ngo.getLocation());
+        dto.setVerified(ngo.isVerified());
+
+        return dto;
     }
 }

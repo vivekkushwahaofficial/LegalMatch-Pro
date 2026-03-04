@@ -1,43 +1,33 @@
 package com.legalmatch.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "lawyer_profiles")
 public class LawyerProfile {
 
+    // getters and setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
+    @Column(nullable = false)
     private String specialization;
 
-    // ✅ Proper setters
-    @Setter
+    @Column(name = "license_number")
     private String licenseNumber;
 
-    @Setter
+    @Column(nullable = false)
+    private String location;
+
+    private boolean verified;
+
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
-
-    // ✅ Optional getters (recommended)
-    public Long getId() {
-        return id;
-    }
-
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public String getLicenseNumber() {
-        return licenseNumber;
-    }
-
-    public User getUser() {
-        return user;
-    }
 
 }

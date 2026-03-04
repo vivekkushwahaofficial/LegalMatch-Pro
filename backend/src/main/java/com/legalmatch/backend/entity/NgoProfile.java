@@ -7,8 +7,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "ngo_profiles")
 public class NgoProfile {
@@ -19,33 +22,36 @@ public class NgoProfile {
 
     private String organizationName;
 
-    @Setter
     private String registrationNumber;
 
-    @Setter
+    private String location;
+
+    private boolean verified;
+
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    // ✅ Proper setter for NGO name
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public void setNgoName(String ngoName) {
-        this.organizationName = ngoName;
-    }
-
-    // ✅ Optional getters (good practice)
-    public Long getId() {
-        return id;
-    }
-
-    public String getOrganizationName() {
-        return organizationName;
-    }
-
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
-    public User getUser() {
-        return user;
     }
 }
