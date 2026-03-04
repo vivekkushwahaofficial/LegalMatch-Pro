@@ -23,6 +23,28 @@ public class DirectoryService {
         return lawyerRepository.findAll(PageRequest.of(page, size));
     }
 
+    // Search lawyers by specialization or location
+    public List<LawyerProfile> searchLawyers(String specialization, String location) {
+
+        if (specialization != null && location != null) {
+            return lawyerRepository
+                    .findBySpecializationIgnoreCaseAndLocationIgnoreCase(
+                            specialization, location);
+        }
+
+        if (specialization != null) {
+            return lawyerRepository
+                    .findBySpecializationIgnoreCase(specialization);
+        }
+
+        if (location != null) {
+            return lawyerRepository
+                    .findByLocationIgnoreCase(location);
+        }
+
+        return lawyerRepository.findAll();
+    }
+
     // Get NGOs with optional location filter
     public List<NgoProfile> getNgos(String location) {
 
@@ -32,4 +54,5 @@ public class DirectoryService {
 
         return ngoRepository.findByVerifiedTrue();
     }
+
 }

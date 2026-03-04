@@ -20,14 +20,29 @@ public class DirectoryController {
 
     @GetMapping("/lawyers")
     public List<LawyerDirectoryResponse> getLawyers(
+
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) String location,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
 
-        Page<LawyerProfile> lawyers = directoryService.getLawyers(page, size);
+        List<LawyerProfile> lawyers;
 
-        return lawyers.getContent()
-                .stream()
+        // if search filters exist
+        if (specialization != null || location != null) {
+            lawyers = directoryService.searchLawyers(specialization, location);
+        }
+
+        // otherwise use pagination
+        else {
+            Page<LawyerProfile> lawyerPage =
+                    directoryService.getLawyers(page, size);
+
+            lawyers = lawyerPage.getContent();
+        }
+
+        return lawyers.stream()
                 .map(this::mapLawyer)
                 .toList();
     }

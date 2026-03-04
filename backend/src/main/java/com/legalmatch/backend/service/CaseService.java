@@ -90,4 +90,12 @@ public class CaseService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    public CaseResponse getCaseById(Long id) {
+
+        Case c = caseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Case not found"));
+
+        return mapToResponse(c);
+    }
 }

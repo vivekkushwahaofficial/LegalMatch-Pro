@@ -17,7 +17,6 @@ public class CaseController {
 
     private final CaseService caseService;
 
-    // Citizen create case
     @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping
     public CaseResponse createCase(@RequestBody Case caseRequest,
@@ -26,7 +25,6 @@ public class CaseController {
         return caseService.createCase(caseRequest, authentication.getName());
     }
 
-    // Citizen see their cases
     @PreAuthorize("hasRole('CITIZEN')")
     @GetMapping("/my")
     public List<CaseResponse> getMyCases(Authentication authentication) {
@@ -34,7 +32,6 @@ public class CaseController {
         return caseService.getMyCases(authentication.getName());
     }
 
-    // Admin see all cases
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public List<CaseResponse> getAllCases() {
@@ -42,7 +39,6 @@ public class CaseController {
         return caseService.getAllCases();
     }
 
-    // Update case status
     @PreAuthorize("hasAnyRole('ADMIN','LAWYER')")
     @PutMapping("/{id}/status")
     public CaseResponse updateCaseStatus(@PathVariable Long id,
@@ -51,11 +47,16 @@ public class CaseController {
         return caseService.updateCaseStatus(id, status);
     }
 
-    // Search cases by status
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/search")
     public List<CaseResponse> searchByStatus(@RequestParam String status) {
 
         return caseService.searchByStatus(status);
+    }
+
+    @GetMapping("/{id}")
+    public CaseResponse getCaseById(@PathVariable Long id) {
+
+        return caseService.getCaseById(id);
     }
 }
