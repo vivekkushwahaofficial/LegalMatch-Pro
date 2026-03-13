@@ -1,16 +1,23 @@
 package com.legalmatch.backend.service;
 
-import com.legalmatch.backend.dto.LoginRequest;
-import com.legalmatch.backend.dto.RegisterRequest;
-import com.legalmatch.backend.entity.*;
-import com.legalmatch.backend.repository.*;
-import com.legalmatch.backend.security.JwtService;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.legalmatch.backend.dto.LoginRequest;
+import com.legalmatch.backend.dto.RegisterRequest;
+import com.legalmatch.backend.entity.LawyerProfile;
+import com.legalmatch.backend.entity.NgoProfile;
+import com.legalmatch.backend.entity.Role;
+import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.repository.LawyerProfileRepository;
+import com.legalmatch.backend.repository.NgoProfileRepository;
+import com.legalmatch.backend.repository.UserRepository;
+import com.legalmatch.backend.security.JwtService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +91,7 @@ public class AuthService {
 
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
+        tokens.put("role", user.getRole().name());
 
         return tokens;
     }

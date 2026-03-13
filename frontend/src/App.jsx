@@ -1,20 +1,25 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import { AuthProvider } from "./context/AuthContext";
 import { CaseProvider } from "./context/CaseContext";
+
+import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 
-import AdminDashboard from "./pages/AdminDashboard";
-import LawyerDashboard from "./pages/LawyerDashboard";
-import CitizenDashboard from "./pages/CitizenDashboard";
-import NGODashboard from "./pages/NGODashboard";
+import Signin from "./pages/auth/Signin";
+import Signup from "./pages/auth/Signup";
 
-import Signin from "./pages/Signin";
-import Signup from "./pages/Signup";
-import CaseSubmission from "./pages/CaseSubmission";
-import CaseList from "./pages/CaseList";
-import CaseDetail from "./pages/CaseDetail";
-import LawyerDirectory from "./pages/LawyerDirectory";
-import NgoDirectory from "./pages/NgoDirectory";
+import CitizenDashboard from "./pages/dashboard/CitizenDashboard";
+import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
+import NGODashboard from "./pages/dashboard/NGODashboard";
+import AdminDashboard from "./pages/dashboard/AdminDashboard";
+
+import CaseSubmission from "./pages/cases/CaseSubmission";
+import CaseList from "./pages/cases/CaseList";
+import CaseDetail from "./pages/cases/CaseDetail";
+
+import LawyerDirectory from "./pages/directory/LawyerDirectory";
+import NgoDirectory from "./pages/directory/NgoDirectory";
 
 function App() {
   return (
@@ -24,27 +29,45 @@ function App() {
 
           <Routes>
 
-            {/* Redirect dashboard */}
-            <Route path="/dashboard" element={<Navigate to="/citizen" />} />
-
-            {/* Public Routes */}
             <Route path="/" element={<Signin />} />
             <Route path="/login" element={<Signin />} />
+            <Route path="/signin" element={<Signin />} />
             <Route path="/register" element={<Signup />} />
 
             {/* Admin */}
-            <Route path="/admin" element={<DashboardLayout role="admin" />}>
+            <Route
+              path="/admin"
+              element={
+                <PrivateRoute>
+                  <DashboardLayout role="admin" />
+                </PrivateRoute>
+              }
+            >
               <Route index element={<AdminDashboard />} />
             </Route>
 
             {/* Lawyer */}
-            <Route path="/lawyer" element={<DashboardLayout role="lawyer" />}>
+            <Route
+              path="/lawyer"
+              element={
+                <PrivateRoute>
+                  <DashboardLayout role="lawyer" />
+                </PrivateRoute>
+              }
+            >
               <Route index element={<LawyerDashboard />} />
               <Route path="directory" element={<LawyerDirectory />} />
             </Route>
 
             {/* Citizen */}
-            <Route path="/citizen" element={<DashboardLayout role="citizen" />}>
+            <Route
+              path="/citizen"
+              element={
+                <PrivateRoute>
+                  <DashboardLayout role="citizen" />
+                </PrivateRoute>
+              }
+            >
               <Route index element={<CitizenDashboard />} />
               <Route path="submit-case" element={<CaseSubmission />} />
               <Route path="cases" element={<CaseList />} />
@@ -54,7 +77,14 @@ function App() {
             </Route>
 
             {/* NGO */}
-            <Route path="/ngo" element={<DashboardLayout role="ngo" />}>
+            <Route
+              path="/ngo"
+              element={
+                <PrivateRoute>
+                  <DashboardLayout role="ngo" />
+                </PrivateRoute>
+              }
+            >
               <Route index element={<NGODashboard />} />
             </Route>
 
@@ -67,3 +97,4 @@ function App() {
 }
 
 export default App;
+

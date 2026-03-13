@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCases } from '../context/CaseContext';
+import { useCases } from "../../context/CaseContext";
 
 const CaseSubmission = () => {
     const navigate = useNavigate();
