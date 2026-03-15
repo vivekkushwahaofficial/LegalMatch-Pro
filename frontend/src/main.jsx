@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+import { AuthProvider } from "./context/AuthContext";
+import { CaseProvider } from "./context/CaseContext";
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -34,7 +37,11 @@ class ErrorBoundary extends Component {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <App />
+      <AuthProvider>
+        <CaseProvider>
+          <App />
+        </CaseProvider>
+      </AuthProvider>
     </ErrorBoundary>
-  </StrictMode>,
+  </StrictMode>
 )

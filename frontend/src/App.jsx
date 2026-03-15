@@ -20,6 +20,12 @@ import CaseDetail from "./pages/cases/CaseDetail";
 
 import LawyerDirectory from "./pages/directory/LawyerDirectory";
 import NgoDirectory from "./pages/directory/NgoDirectory";
+import Matching from "./pages/matching/Matches";
+import LawyerProfile from "./pages/profiles/LawyerProfile";
+import AssignedCases from "./components/cases/AssignedCases";
+import Profile from "./pages/profiles/Profile";
+
+
 
 function App() {
   return (
@@ -33,6 +39,7 @@ function App() {
             <Route path="/login" element={<Signin />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/register" element={<Signup />} />
+            <Route path="/case/:id" element={<CaseDetail />} />
 
             {/* Admin */}
             <Route
@@ -87,6 +94,9 @@ function App() {
             >
               <Route index element={<NGODashboard />} />
             </Route>
+            <Route path="/matches" element={<Matching />} />
+            <Route path="/lawyer-profile" element={<LawyerProfile />} />
+            <Route path="/assigned-cases" element={<AssignedCases />} />
 
           </Routes>
 

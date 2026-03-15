@@ -1,49 +1,66 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const CaseDetail = () => {
+export default function CaseDetail() {
+
   const { id } = useParams();
-  const [caseData, setCaseData] = useState(null);
 
-  useEffect(() => {
-    fetchCase();
-  }, []);
-
-  const fetchCase = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/cases/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      setCaseData(response.data);
-    } catch (error) {
-      console.log("Case detail API not ready");
-    }
+  const caseData = {
+    title: "Child Custody Dispute",
+    description:
+      "A parent seeking legal assistance regarding child custody rights after divorce.",
+    category: "Family Law",
+    location: "Chennai",
+    urgency: "High",
+    submittedBy: "Citizen User"
   };
 
-  if (!caseData) return <p className="p-6">Loading...</p>;
-
   return (
-    <div className="p-6 bg-white shadow rounded">
-      <h2 className="text-2xl font-bold mb-4">
-        {caseData.title}
-      </h2>
-      <p className="mb-2">
-        <strong>Description:</strong> {caseData.description}
-      </p>
-      <p>
-        <strong>Status:</strong> {caseData.status}
-      </p>
-      <p>
-        <strong>Created At:</strong> {caseData.createdAt}
-      </p>
+    <div className="p-6 max-w-3xl mx-auto">
+
+      <h1 className="text-2xl font-bold mb-4">
+        Case Details
+      </h1>
+
+      <div className="bg-white shadow-md rounded-lg p-6 space-y-3">
+
+        <h2 className="text-xl font-semibold">
+          {caseData.title}
+        </h2>
+
+        <p className="text-gray-600">
+          {caseData.description}
+        </p>
+
+        <p>
+          <span className="font-medium">Category:</span> {caseData.category}
+        </p>
+
+        <p>
+          <span className="font-medium">Location:</span> {caseData.location}
+        </p>
+
+        <p>
+          <span className="font-medium">Urgency:</span> {caseData.urgency}
+        </p>
+
+        <p>
+          <span className="font-medium">Submitted By:</span> {caseData.submittedBy}
+        </p>
+
+        <div className="flex gap-3 pt-4">
+
+          <button className="flex-1 bg-green-500 text-white py-2 rounded-lg">
+            Accept Case
+          </button>
+
+          <button className="flex-1 bg-red-500 text-white py-2 rounded-lg">
+            Decline Case
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
   );
-};
-
-export default CaseDetail;
+}
