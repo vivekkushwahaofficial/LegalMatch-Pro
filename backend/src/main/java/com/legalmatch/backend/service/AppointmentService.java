@@ -1,7 +1,7 @@
-package com.legalaid.service;
+package com.legalmatch.backend.service;
 
-import com.legalaid.model.Appointment;
-import com.legalaid.repository.AppointmentRepository;
+import com.legalmatch.backend.entity.Appointment;
+import com.legalmatch.backend.repository.AppointmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

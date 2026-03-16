@@ -50,6 +50,7 @@ function Signin() {
       login(result.accessToken);
       
       localStorage.setItem("refreshToken", result.refreshToken);
+      localStorage.setItem("userName", result.name);
 
       alert("Login successful!");
 

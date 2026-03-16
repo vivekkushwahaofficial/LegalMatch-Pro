@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -19,6 +20,18 @@ import {
 
 const Sidebar = ({ role }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    // remove stored login data
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userName");
+
+    // redirect to login page
+    navigate("/login");
+  };
 
   // Simplified navigation structure based on the image
   // Image shows: Profile Management, Case Submission, Directory, Matches, Impact Dashboard, Admin Panel
@@ -114,8 +127,10 @@ const Sidebar = ({ role }) => {
         <div className="p-4 border-t border-slate-100">
           {/* Placeholder for user profile at bottom if needed, though image shows it top right maybe? */}
           {/* The image shows a user avatar in the top right of the main content. We'll leave sidebar simple. */}
-          <button className="flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm font-medium px-3">
-            <LogOut size={18} />
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm font-medium px-3"
+          >            <LogOut size={18} />
             <span>Log Out</span>
           </button>
         </div>

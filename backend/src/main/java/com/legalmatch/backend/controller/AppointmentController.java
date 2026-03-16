@@ -1,13 +1,13 @@
-package com.legalaid.controller;
+package com.legalmatch.backend.controller;
 
-import com.legalaid.model.Appointment;
-import com.legalaid.service.AppointmentService;
+import com.legalmatch.backend.entity.Appointment;
+import com.legalmatch.backend.service.AppointmentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/appointments")
+@RequestMapping("/api/appointments")
 public class AppointmentController {
 
     private final AppointmentService service;

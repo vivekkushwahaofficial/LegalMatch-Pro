@@ -1,5 +1,6 @@
 package com.legalmatch.backend.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.legalmatch.backend.entity.LawyerProfile;
 import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.entity.VerificationStatus;
 import com.legalmatch.backend.repository.LawyerProfileRepository;
 import com.legalmatch.backend.repository.NgoProfileRepository;
 import com.legalmatch.backend.repository.UserRepository;
@@ -39,11 +41,18 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setSubmittedDate(LocalDateTime.now());
+        user.setStatus(VerificationStatus.PENDING);
 
         if (request.getRole().equalsIgnoreCase("LAWYER")) {
             user.setRole(Role.LAWYER);
+
         } else if (request.getRole().equalsIgnoreCase("NGO")) {
             user.setRole(Role.NGO);
+
+        } else if (request.getRole().equalsIgnoreCase("ADMIN")) {
+            user.setRole(Role.ADMIN);
+
         } else {
             user.setRole(Role.CITIZEN);
         }
@@ -92,6 +101,7 @@ public class AuthService {
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
         tokens.put("role", user.getRole().name());
+        tokens.put("name", user.getName());
 
         return tokens;
     }
@@ -117,6 +127,7 @@ public class AuthService {
         Map<String, String> response = new HashMap<>();
 
         response.put("accessToken", newAccessToken);
+        response.put("name", user.getName());
 
         return response;
     }

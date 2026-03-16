@@ -1,7 +1,8 @@
-package com.legalaid.repository;
+package com.legalmatch.backend.repository;
 
-import com.legalaid.model.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.legalmatch.backend.entity.Appointment;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 }

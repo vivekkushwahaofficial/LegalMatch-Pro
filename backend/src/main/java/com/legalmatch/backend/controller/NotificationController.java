@@ -1,13 +1,18 @@
-package com.legalaid.controller;
-
-import com.legalaid.model.Notification;
-import org.springframework.web.bind.annotation.*;
+package com.legalmatch.backend.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.legalmatch.backend.entity.Notification;
+
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 public class NotificationController {
 
     private List<Notification> notifications = new ArrayList<>();
@@ -25,7 +30,7 @@ public class NotificationController {
                 .findFirst()
                 .orElse(null);
 
-        if(n != null) {
+        if (n != null) {
             n.setReadStatus(true);
         }
 
