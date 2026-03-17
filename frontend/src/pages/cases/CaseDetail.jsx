@@ -1,18 +1,36 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { apiCall } from "../../api/apiConfig";
 
 export default function CaseDetail() {
 
   const { id } = useParams();
 
-  const caseData = {
-    title: "Child Custody Dispute",
-    description:
-      "A parent seeking legal assistance regarding child custody rights after divorce.",
-    category: "Family Law",
-    location: "Chennai",
-    urgency: "High",
-    submittedBy: "Citizen User"
+  const [caseData, setCaseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCase();
+  }, [id]);
+
+  const fetchCase = async () => {
+    try {
+      const response = await apiCall(`/cases/${id}`, "GET");
+      setCaseData(response);
+    } catch (error) {
+      console.log("Error fetching case");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <p className="p-6">Loading case details...</p>;
+  }
+
+  if (!caseData) {
+    return <p className="p-6 text-red-500">Case not found</p>;
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -40,24 +58,22 @@ export default function CaseDetail() {
         </p>
 
         <p>
-          <span className="font-medium">Urgency:</span> {caseData.urgency}
-        </p>
+          <p>
+            <span className="font-medium">Status:</span>{" "}
+            <span className={`px-2 py-1 rounded text-sm ${caseData.status === "SUBMITTED"
+                ? "bg-yellow-100 text-yellow-700"
+                : caseData.status === "MATCHED"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-700"
+              }`}>
+              {caseData.status}
+            </span>
+          </p>        </p>
 
         <p>
-          <span className="font-medium">Submitted By:</span> {caseData.submittedBy}
+          <span className="font-medium">Created:</span>{" "}
+          {new Date(caseData.createdAt).toLocaleDateString()}
         </p>
-
-        <div className="flex gap-3 pt-4">
-
-          <button className="flex-1 bg-green-500 text-white py-2 rounded-lg">
-            Accept Case
-          </button>
-
-          <button className="flex-1 bg-red-500 text-white py-2 rounded-lg">
-            Decline Case
-          </button>
-
-        </div>
 
       </div>
 
