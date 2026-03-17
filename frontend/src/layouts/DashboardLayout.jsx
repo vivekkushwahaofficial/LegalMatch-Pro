@@ -1,6 +1,6 @@
+import NotificationPanel from "../components/NotificationPanel";
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { Bell } from 'lucide-react';
 
 const DashboardLayout = ({ role }) => {
 
@@ -23,10 +23,10 @@ const DashboardLayout = ({ role }) => {
 
           <div className="flex items-center gap-4">
 
-            <button className="text-slate-400 hover:text-slate-600">
-              <Bell size={20} />
-            </button>
+            {/* ✅ Notification */}
+            <NotificationPanel />
 
+            {/* Profile */}
             <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 overflow-hidden">
               <span className="text-xs font-bold">
                 {initials}

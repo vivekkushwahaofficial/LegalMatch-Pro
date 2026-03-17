@@ -7,21 +7,17 @@ const ConversationList = ({ conversations, onSelectChat }) => {
     <div className="w-80 border-r bg-white flex flex-col">
 
       {/* search box */}
-
       <div className="p-4 border-b">
-
         <input
           className="w-full border rounded p-2 text-sm"
           placeholder="Search conversations..."
         />
-
       </div>
 
       {/* conversation list */}
-
       <div className="flex-1 overflow-y-auto">
 
-        {conversations.map((c) => (
+        {(conversations || []).map((c) => (
 
           <div
             key={c.id}

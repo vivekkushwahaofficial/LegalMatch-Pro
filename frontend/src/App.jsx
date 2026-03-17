@@ -93,13 +93,16 @@ function App() {
           <Route index element={<NGODashboard />} />
         </Route>
         <Route
-          path="/chat"
+          path="/citizen"
           element={
             <PrivateRoute>
-              <ChatPage />
+              <DashboardLayout role="citizen" />
             </PrivateRoute>
           }
-        />
+        >
+          <Route index element={<CitizenDashboard />} />
+          <Route path="chat" element={<ChatPage />} />
+        </Route>
         <Route
           path="/matches"
           element={

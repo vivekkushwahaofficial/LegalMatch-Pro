@@ -123,6 +123,10 @@ const Sidebar = ({ role }) => {
           ))}
         </nav>
 
+        <NavLink to="/citizen/chat">
+          Chat
+        </NavLink>
+        
         {/* User Profile (Bottom) */}
         <div className="p-4 border-t border-slate-100">
           {/* Placeholder for user profile at bottom if needed, though image shows it top right maybe? */}
