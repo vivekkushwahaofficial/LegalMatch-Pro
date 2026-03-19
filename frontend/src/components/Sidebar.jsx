@@ -57,11 +57,10 @@ const Sidebar = ({ role }) => {
       case 'citizen':
         return [
           { name: 'Profile Management', path: '/citizen/profile', icon: User },
-          { name: 'Case Submission', path: '/citizen/cases', icon: FolderOpen },
-          { name: 'Directory', path: '/citizen/directory', icon: Search },
+          { name: 'Case Submission', path: '/citizen/submit-case', icon: FolderOpen },
+          { name: 'Directory', path: '/citizen/lawyers', icon: Search },
           { name: 'Matches', path: '/citizen/matches', icon: Shield },
-          { name: 'Impact Dashboard', path: '/citizen/impact', icon: BarChart },
-          { name: 'Admin Panel', path: '/admin', icon: Settings },
+          { name: 'Impact Dashboard', path: '/citizen', icon: BarChart }, // temporary
         ];
       default: return [];
     }
@@ -123,10 +122,10 @@ const Sidebar = ({ role }) => {
           ))}
         </nav>
 
-        <NavLink to="/citizen/chat">
+        <NavLink to={`/${role}/chat`}>
           Chat
         </NavLink>
-        
+
         {/* User Profile (Bottom) */}
         <div className="p-4 border-t border-slate-100">
           {/* Placeholder for user profile at bottom if needed, though image shows it top right maybe? */}

@@ -1,7 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
-import { AuthProvider } from "./context/AuthContext";
-import { CaseProvider } from "./context/CaseContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -21,18 +18,18 @@ import CaseDetail from "./pages/cases/CaseDetail";
 import LawyerDirectory from "./pages/directory/LawyerDirectory";
 import NgoDirectory from "./pages/directory/NgoDirectory";
 import Matching from "./pages/matching/Matches";
+
 import LawyerProfile from "./pages/profiles/LawyerProfile";
 import AssignedCases from "./components/cases/AssignedCases";
-import Profile from "./pages/profiles/Profile";
 import ChatPage from "./pages/chat/ChatPage";
-
+import Profile from "./pages/profiles/Profile";
 
 function App() {
   return (
     <Router>
-
       <Routes>
 
+        {/* Public Routes */}
         <Route path="/" element={<Signin />} />
         <Route path="/login" element={<Signin />} />
         <Route path="/signin" element={<Signin />} />
@@ -74,11 +71,14 @@ function App() {
           }
         >
           <Route index element={<CitizenDashboard />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="submit-case" element={<CaseSubmission />} />
           <Route path="cases" element={<CaseList />} />
           <Route path="case/:id" element={<CaseDetail />} />
           <Route path="lawyers" element={<LawyerDirectory />} />
           <Route path="ngos" element={<NgoDirectory />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="matches" element={<Matching />} />
         </Route>
 
         {/* NGO */}
@@ -92,26 +92,9 @@ function App() {
         >
           <Route index element={<NGODashboard />} />
         </Route>
-        <Route
-          path="/citizen"
-          element={
-            <PrivateRoute>
-              <DashboardLayout role="citizen" />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<CitizenDashboard />} />
-          <Route path="chat" element={<ChatPage />} />
-        </Route>
-        <Route
-          path="/matches"
-          element={
-            <PrivateRoute>
-              <Matching />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/lawyer-profile" element={<LawyerProfile />} />
+
+        {/* Other */}
+        <Route path="/lawyer-profile/:id" element={<LawyerProfile />} />
         <Route path="/assigned-cases" element={<AssignedCases />} />
 
       </Routes>
@@ -120,4 +103,3 @@ function App() {
 }
 
 export default App;
-

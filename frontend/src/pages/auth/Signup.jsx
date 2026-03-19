@@ -1,3 +1,4 @@
+import { useState } from "react"; // ✅ IMPORTANT
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -23,6 +24,9 @@ const schema = yup.object({
 function Signup() {
   const navigate = useNavigate();
 
+  // ✅ ADD LOCATION STATE HERE (inside function)
+  const [location, setLocation] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -43,6 +47,7 @@ function Signup() {
           email: data.email,
           password: data.password,
           role: data.role.toUpperCase(),
+          location: location, // ✅ SEND LOCATION
         }),
       });
 
@@ -70,6 +75,7 @@ function Signup() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
 
+          {/* Name */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Name</label>
             <input
@@ -79,6 +85,7 @@ function Signup() {
             <p className="text-red-500 text-sm">{errors.name?.message}</p>
           </div>
 
+          {/* Email */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Email</label>
             <input
@@ -89,6 +96,7 @@ function Signup() {
             <p className="text-red-500 text-sm">{errors.email?.message}</p>
           </div>
 
+          {/* Password */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Password</label>
             <input
@@ -99,6 +107,7 @@ function Signup() {
             <p className="text-red-500 text-sm">{errors.password?.message}</p>
           </div>
 
+          {/* Confirm Password */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Confirm Password</label>
             <input
@@ -111,6 +120,7 @@ function Signup() {
             </p>
           </div>
 
+          {/* Role */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Role</label>
             <select
@@ -124,6 +134,18 @@ function Signup() {
               <option value="Admin">Admin</option>
             </select>
             <p className="text-red-500 text-sm">{errors.role?.message}</p>
+          </div>
+
+          {/* ✅ NEW LOCATION FIELD */}
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2">Location</label>
+            <input
+              type="text"
+              placeholder="Enter your location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            />
           </div>
 
           <button
@@ -147,4 +169,3 @@ function Signup() {
 }
 
 export default Signup;
-
