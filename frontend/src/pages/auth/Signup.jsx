@@ -1,4 +1,3 @@
-import { useState } from "react"; // ✅ IMPORTANT
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -43,9 +42,6 @@ const schema = yup.object({
 function Signup() {
   const navigate = useNavigate();
 
-  // ✅ ADD LOCATION STATE HERE (inside function)
-  const [location, setLocation] = useState("");
-
   const {
     register,
     handleSubmit,
@@ -67,7 +63,9 @@ function Signup() {
           email: data.email,
           password: data.password,
           role: data.role.toUpperCase(),
-        }),
+          specialization: data.specialization || null,
+          location: data.location || null
+        })
       });
 
       const result = await response.text();
@@ -152,18 +150,6 @@ function Signup() {
               <option value="NGO">NGO</option>
               <option value="Admin">Admin</option>
             </select>
-          </div>
-
-          {/* ✅ NEW LOCATION FIELD */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Location</label>
-            <input
-              type="text"
-              placeholder="Enter your location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
           </div>
 
           {watch("role") === "Lawyer" && (
