@@ -54,4 +54,8 @@ public class NgoProfile {
 
     public void setNgoName(String ngoName) {
     }
+
+    public String getSpecialization() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

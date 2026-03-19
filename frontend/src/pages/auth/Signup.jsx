@@ -6,19 +6,38 @@ import { useNavigate, Link } from "react-router-dom";
 
 const schema = yup.object({
   name: yup.string().required("Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
+
+  email: yup
+    .string()
+    .email("Invalid email")
+    .required("Email is required"),
+
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match")
     .required("Confirm password is required"),
+
   role: yup
     .string()
-    .oneOf(["Citizen", "Lawyer", "NGO", "Admin"], "Invalid role")
+    .oneOf(["Citizen", "Lawyer", "NGO", "Admin"])
     .required("Role is required"),
+
+  specialization: yup.string().when("role", {
+    is: "Lawyer",
+    then: (schema) => schema.required("Specialization is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  location: yup.string().when("role", {
+    is: "Lawyer",
+    then: (schema) => schema.required("Location is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 function Signup() {
@@ -30,6 +49,7 @@ function Signup() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -47,7 +67,6 @@ function Signup() {
           email: data.email,
           password: data.password,
           role: data.role.toUpperCase(),
-          location: location, // ✅ SEND LOCATION
         }),
       });
 
@@ -133,7 +152,6 @@ function Signup() {
               <option value="NGO">NGO</option>
               <option value="Admin">Admin</option>
             </select>
-            <p className="text-red-500 text-sm">{errors.role?.message}</p>
           </div>
 
           {/* ✅ NEW LOCATION FIELD */}
@@ -148,6 +166,56 @@ function Signup() {
             />
           </div>
 
+          {watch("role") === "Lawyer" && (
+            <>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Specialization</label>
+                <select
+                  {...register("specialization")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">Select Specialization</option>
+                  <option value="Criminal">Criminal</option>
+                  <option value="Civil">Civil</option>
+                  <option value="Corporate">Corporate</option>
+                  <option value="Family">Family</option>
+                  <option value="Property">Property</option>
+                </select>
+                <p className="text-red-500 text-sm">
+                  {errors.specialization?.message}
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Location</label>
+
+                <select
+                  {...register("location")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">Select Location</option>
+                  <option value="Bhopal">Bhopal</option>
+                  <option value="Indore">Indore</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Other">Other</option>
+                </select>
+
+                {/* 👇 Show input if Other selected */}
+                {watch("location") === "Other" && (
+                  <input
+                    {...register("location")}
+                    placeholder="Enter your location"
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                )}
+
+                <p className="text-red-500 text-sm">
+                  {errors.location?.message}
+                </p>
+              </div>
+            </>
+          )}
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"

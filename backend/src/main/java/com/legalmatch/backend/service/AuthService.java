@@ -33,47 +33,59 @@ public class AuthService {
 
     public String register(RegisterRequest request) {
 
+        // Step 1: Check email
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
 
+        // Step 2: Decide role
+        Role role;
+
+        if (request.getRole().equalsIgnoreCase("LAWYER")) {
+            role = Role.LAWYER;
+        } else if (request.getRole().equalsIgnoreCase("NGO")) {
+            role = Role.NGO;
+        } else if (request.getRole().equalsIgnoreCase("ADMIN")) {
+            role = Role.ADMIN;
+        } else {
+            role = Role.CITIZEN;
+        }
+
+        // Step 3: Validate BEFORE saving
+        if (role == Role.LAWYER) {
+            if (request.getSpecialization() == null || request.getSpecialization().isBlank()
+                    || request.getLocation() == null || request.getLocation().isBlank()) {
+
+                throw new RuntimeException("Specialization and location required for lawyer");
+            }
+        }
+
+        // Step 4: Create user ONLY ONCE
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setSubmittedDate(LocalDateTime.now());
         user.setStatus(VerificationStatus.PENDING);
+        user.setRole(role);
 
-        if (request.getRole().equalsIgnoreCase("LAWYER")) {
-            user.setRole(Role.LAWYER);
-
-        } else if (request.getRole().equalsIgnoreCase("NGO")) {
-            user.setRole(Role.NGO);
-
-        } else if (request.getRole().equalsIgnoreCase("ADMIN")) {
-            user.setRole(Role.ADMIN);
-
-        } else {
-            user.setRole(Role.CITIZEN);
-        }
-
+        // Step 5: Save user
         userRepository.save(user);
 
-        Role role = user.getRole();
-
+        // Step 6: Create profile
         if (role == Role.LAWYER) {
-
             LawyerProfile profile = new LawyerProfile();
             profile.setUser(user);
+            profile.setSpecialization(request.getSpecialization());
+            profile.setLocation(request.getLocation());
+            profile.setVerified(false);
 
             lawyerProfileRepository.save(profile);
         }
 
         if (role == Role.NGO) {
-
             NgoProfile profile = new NgoProfile();
             profile.setUser(user);
-
             ngoProfileRepository.save(profile);
         }
 

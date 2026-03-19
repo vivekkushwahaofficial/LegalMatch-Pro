@@ -1,11 +1,13 @@
 package com.legalmatch.backend.service;
 
+import org.springframework.stereotype.Service;
+
 import com.legalmatch.backend.dto.ProfileResponse;
 import com.legalmatch.backend.dto.ProfileUpdateRequest;
 import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -78,5 +80,9 @@ public class ProfileService {
         response.setRole(user.getRole().name());
 
         return response;
+    }
+
+    User getCurrentUser() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

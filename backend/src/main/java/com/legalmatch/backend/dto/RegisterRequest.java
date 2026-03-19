@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 
 public class RegisterRequest {
+
     //getter and setter
     @NotBlank(message = "Name is required")
     private String name;
@@ -22,4 +23,10 @@ public class RegisterRequest {
 
     @NotBlank(message = "Role is required")
     private String role;
+    
+    @NotBlank(message = "Specialization required")
+    private String specialization;
+
+    @NotBlank(message = "Location required")
+    private String location;
 }
