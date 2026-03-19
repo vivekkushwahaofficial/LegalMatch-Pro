@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/profile/**").authenticated()
                 .requestMatchers("/api/cases/**").authenticated()
                 .requestMatchers("/api/directory/**").authenticated()
+                .requestMatchers("/api/matches/**").authenticated()
                 // Everything else requires login
                 .anyRequest().authenticated()
                 )
