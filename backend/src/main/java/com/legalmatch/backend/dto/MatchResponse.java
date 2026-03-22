@@ -13,6 +13,7 @@ public class MatchResponse {
     private Long matchedUserId;
     private String matchedUserName;
     private String matchedUserRole;
+    private String specialization;
     private String matchStatus;
     private double score;
 }

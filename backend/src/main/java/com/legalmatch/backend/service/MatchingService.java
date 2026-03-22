@@ -104,13 +104,22 @@ public class MatchingService {
     }
 
     private MatchResponse mapToResponse(Match match) {
+        String specialization = "";
+        User matchedUser = match.getMatchedUser();
+        if (matchedUser.getRole() == Role.LAWYER && matchedUser.getLawyerProfile() != null) {
+            specialization = matchedUser.getLawyerProfile().getSpecialization();
+        } else if (matchedUser.getRole() == Role.NGO && matchedUser.getNgoProfile() != null) {
+            specialization = matchedUser.getNgoProfile().getSpecialization();
+        }
+
         return MatchResponse.builder()
                 .matchId(match.getMatchId())
                 .caseId(match.getLegalCase().getId())
                 .caseTitle(match.getLegalCase().getTitle())
-                .matchedUserId(match.getMatchedUser().getId())
-                .matchedUserName(match.getMatchedUser().getName())
-                .matchedUserRole(match.getMatchedUser().getRole().toString())
+                .matchedUserId(matchedUser.getId())
+                .matchedUserName(matchedUser.getName())
+                .matchedUserRole(matchedUser.getRole().toString())
+                .specialization(specialization)
                 .matchStatus(match.getMatchStatus())
                 .score(match.getScore())
                 .build();

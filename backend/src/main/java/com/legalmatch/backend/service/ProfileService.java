@@ -1,10 +1,11 @@
 package com.legalmatch.backend.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.legalmatch.backend.dto.ProfileResponse;
 import com.legalmatch.backend.dto.ProfileUpdateRequest;
-import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.entity.*;
 import com.legalmatch.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,7 @@ public class ProfileService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        ProfileResponse response = new ProfileResponse();
-
-        response.setId(user.getId());
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        response.setRole(user.getRole().name());
-
-        return response;
+        return mapToResponse(user);
     }
 
     public ProfileResponse updateMyProfile(String email, ProfileUpdateRequest request) {
@@ -41,48 +35,57 @@ public class ProfileService {
         }
 
         // lawyer updates
-        if (user.getRole().name().equals("LAWYER")) {
-
-            if (user.getLawyerProfile() != null) {
-
-                if (request.getSpecialization() != null) {
-                    user.getLawyerProfile().setSpecialization(request.getSpecialization());
-                }
-
-                if (request.getLicenseNumber() != null) {
-                    user.getLawyerProfile().setLicenseNumber(request.getLicenseNumber());
-                }
-            }
+        if (user.getRole() == Role.LAWYER && user.getLawyerProfile() != null) {
+            LawyerProfile lp = user.getLawyerProfile();
+            if (request.getSpecialization() != null) lp.setSpecialization(request.getSpecialization());
+            if (request.getLicenseNumber() != null) lp.setLicenseNumber(request.getLicenseNumber());
+            if (request.getLocation() != null) lp.setLocation(request.getLocation());
         }
 
         // NGO updates
-        if (user.getRole().name().equals("NGO")) {
-
-            if (user.getNgoProfile() != null) {
-
-                if (request.getNgoName() != null) {
-                    user.getNgoProfile().setNgoName(request.getNgoName());
-                }
-
-                if (request.getRegistrationNumber() != null) {
-                    user.getNgoProfile().setRegistrationNumber(request.getRegistrationNumber());
-                }
-            }
+        if (user.getRole() == Role.NGO && user.getNgoProfile() != null) {
+            NgoProfile np = user.getNgoProfile();
+            if (request.getNgoName() != null) np.setNgoName(request.getNgoName());
+            if (request.getRegistrationNumber() != null) np.setRegistrationNumber(request.getRegistrationNumber());
+            if (request.getLocation() != null) np.setLocation(request.getLocation());
+            if (request.getSpecialization() != null) np.setSpecialization(request.getSpecialization());
         }
 
         userRepository.save(user);
 
-        ProfileResponse response = new ProfileResponse();
+        return mapToResponse(user);
+    }
 
+    private ProfileResponse mapToResponse(User user) {
+        ProfileResponse response = new ProfileResponse();
         response.setId(user.getId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().name());
 
+        if (user.getRole() == Role.LAWYER && user.getLawyerProfile() != null) {
+            LawyerProfile lp = user.getLawyerProfile();
+            response.setSpecialization(lp.getSpecialization());
+            response.setLocation(lp.getLocation());
+            response.setVerified(lp.isVerified());
+            response.setLicenseNumber(lp.getLicenseNumber());
+        }
+
+        if (user.getRole() == Role.NGO && user.getNgoProfile() != null) {
+            NgoProfile np = user.getNgoProfile();
+            response.setSpecialization(np.getSpecialization());
+            response.setLocation(np.getLocation());
+            response.setVerified(np.isVerified());
+            response.setNgoName(np.getNgoName());
+            response.setRegistrationNumber(np.getRegistrationNumber());
+        }
+
         return response;
     }
 
-    User getCurrentUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

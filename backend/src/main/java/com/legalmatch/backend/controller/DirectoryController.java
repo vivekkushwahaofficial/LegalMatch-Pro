@@ -74,7 +74,7 @@ public class DirectoryController {
 
         NgoDirectoryResponse dto = new NgoDirectoryResponse();
 
-        dto.setOrganizationName(ngo.getOrganizationName());
+        dto.setNgoName(ngo.getNgoName());
         dto.setLocation(ngo.getLocation());
         dto.setVerified(ngo.isVerified());
 

@@ -6,9 +6,12 @@ import lombok.Data;
 public class ProfileUpdateRequest {
 
     private String name;
+    private String location;
+
+    // For Lawyer/NGO
+    private String specialization;
 
     // For Lawyer
-    private String specialization;
     private String licenseNumber;
 
     // For NGO

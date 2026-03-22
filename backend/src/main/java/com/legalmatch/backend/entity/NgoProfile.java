@@ -20,7 +20,9 @@ public class NgoProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String organizationName;
+    private String ngoName;
+
+    private String specialization;
 
     private String registrationNumber;
 
@@ -32,30 +34,4 @@ public class NgoProfile {
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
-    }
-
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setVerified(boolean verified) {
-        this.verified = verified;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setNgoName(String ngoName) {
-    }
-
-    public String getSpecialization() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
