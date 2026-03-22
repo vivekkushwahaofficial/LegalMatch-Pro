@@ -34,4 +34,9 @@ public class MatchController {
     public ResponseEntity<MatchResponse> rejectMatch(@PathVariable Long matchId) {
         return ResponseEntity.ok(matchingService.updateMatchStatus(matchId, "REJECTED"));
     }
+
+    @PutMapping("/{matchId}/approve-chat")
+    public ResponseEntity<MatchResponse> approveChat(@PathVariable Long matchId, @RequestParam boolean approve) {
+        return ResponseEntity.ok(matchingService.updateChatApproval(matchId, approve));
+    }
 }

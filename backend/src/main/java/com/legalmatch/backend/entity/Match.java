@@ -27,6 +27,9 @@ public class Match {
 
     private String matchStatus; // PENDING, ACCEPTED, REJECTED
 
+    private boolean lawyerApprovedChat;
+    private boolean ngoApprovedChat;
+
     private double score;
 
     private LocalDateTime createdAt;

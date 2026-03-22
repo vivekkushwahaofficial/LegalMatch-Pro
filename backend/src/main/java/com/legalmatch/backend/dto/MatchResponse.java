@@ -15,5 +15,7 @@ public class MatchResponse {
     private String matchedUserRole;
     private String specialization;
     private String matchStatus;
+    private boolean lawyerApprovedChat;
+    private boolean ngoApprovedChat;
     private double score;
 }

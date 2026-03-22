@@ -103,6 +103,23 @@ public class MatchingService {
         return mapToResponse(matchRepository.save(match));
     }
 
+    @Transactional
+    public MatchResponse updateChatApproval(Long matchId, boolean approve) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        User currentUser = profileService.getCurrentUser();
+
+        if (currentUser.getRole() == Role.LAWYER) {
+            match.setLawyerApprovedChat(approve);
+        } else if (currentUser.getRole() == Role.NGO) {
+            match.setNgoApprovedChat(approve);
+        } else {
+            throw new RuntimeException("Only Lawyers and NGOs can approve chat");
+        }
+
+        return mapToResponse(matchRepository.save(match));
+    }
+
     private MatchResponse mapToResponse(Match match) {
         String specialization = "";
         User matchedUser = match.getMatchedUser();
@@ -121,6 +138,8 @@ public class MatchingService {
                 .matchedUserRole(matchedUser.getRole().toString())
                 .specialization(specialization)
                 .matchStatus(match.getMatchStatus())
+                .lawyerApprovedChat(match.isLawyerApprovedChat())
+                .ngoApprovedChat(match.isNgoApprovedChat())
                 .score(match.getScore())
                 .build();
     }
