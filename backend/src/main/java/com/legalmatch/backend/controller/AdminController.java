@@ -12,14 +12,15 @@ import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.entity.VerificationStatus;
 import com.legalmatch.backend.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/admin")
-@RequiredArgsConstructor
 public class AdminController {
 
     private final UserRepository userRepository;
+
+    public AdminController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // Test API
     @GetMapping("/dashboard")

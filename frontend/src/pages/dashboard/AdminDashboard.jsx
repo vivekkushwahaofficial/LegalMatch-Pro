@@ -8,6 +8,7 @@ import {
   XCircle,
   Clock
 } from 'lucide-react';
+import ImpactDashboard from '../../components/dashboard/ImpactDashboard';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('userVerification');
@@ -223,6 +224,10 @@ const AdminDashboard = () => {
             </table>
           </div>
         </div>
+      )}
+
+      {activeTab === 'logs' && (
+        <ImpactDashboard />
       )}
     </div>
   );

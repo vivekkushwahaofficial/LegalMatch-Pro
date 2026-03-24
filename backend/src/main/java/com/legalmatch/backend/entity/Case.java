@@ -14,8 +14,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "cases")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Case {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +43,18 @@ public class Case {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    private String location;
+    private String keywords;
+    private String dateTime;
+    private String contactInfo;
+    private String otherPartyName;
+    private String otherPartyLocation;
+    private String otherPartyContact;
+    private String otherPartyRepresentative;
+    private String investigatingOfficer;
+    @Column(length = 1000)
+    private String witnesses;
 
     public Long getId() {
         return id;
@@ -106,6 +121,82 @@ public class Case {
     }
 
     public String getLocation() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public String getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(String contactInfo) {
+        this.contactInfo = contactInfo;
+    }
+
+    public String getOtherPartyName() {
+        return otherPartyName;
+    }
+
+    public void setOtherPartyName(String otherPartyName) {
+        this.otherPartyName = otherPartyName;
+    }
+
+    public String getOtherPartyLocation() {
+        return otherPartyLocation;
+    }
+
+    public void setOtherPartyLocation(String otherPartyLocation) {
+        this.otherPartyLocation = otherPartyLocation;
+    }
+
+    public String getOtherPartyContact() {
+        return otherPartyContact;
+    }
+
+    public void setOtherPartyContact(String otherPartyContact) {
+        this.otherPartyContact = otherPartyContact;
+    }
+
+    public String getOtherPartyRepresentative() {
+        return otherPartyRepresentative;
+    }
+
+    public void setOtherPartyRepresentative(String otherPartyRepresentative) {
+        this.otherPartyRepresentative = otherPartyRepresentative;
+    }
+
+    public String getInvestigatingOfficer() {
+        return investigatingOfficer;
+    }
+
+    public void setInvestigatingOfficer(String investigatingOfficer) {
+        this.investigatingOfficer = investigatingOfficer;
+    }
+
+    public String getWitnesses() {
+        return witnesses;
+    }
+
+    public void setWitnesses(String witnesses) {
+        this.witnesses = witnesses;
     }
 }

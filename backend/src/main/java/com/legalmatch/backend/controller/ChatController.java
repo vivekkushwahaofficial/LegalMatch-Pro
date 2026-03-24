@@ -2,7 +2,6 @@ package com.legalmatch.backend.controller;
 
 import com.legalmatch.backend.entity.ChatMessage;
 import com.legalmatch.backend.service.ChatService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,10 +10,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chats")
-@RequiredArgsConstructor
 public class ChatController {
 
     private final ChatService chatService;
+
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
     @MessageMapping("/chat.sendMessage")
     public void receiveMessage(@Payload ChatMessage chatMessage) {

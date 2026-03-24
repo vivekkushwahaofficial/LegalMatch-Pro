@@ -5,12 +5,10 @@ import com.legalmatch.backend.repository.*;
 import com.legalmatch.backend.dto.MatchResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MatchingService {
 
     private final MatchRepository matchRepository;
@@ -18,13 +16,27 @@ public class MatchingService {
     private final LawyerProfileRepository lawyerProfileRepository;
     private final NgoProfileRepository ngoProfileRepository;
     private final ProfileService profileService;
+    private final ImpactService impactService;
+
+    public MatchingService(MatchRepository matchRepository,
+                           CaseRepository caseRepository,
+                           LawyerProfileRepository lawyerProfileRepository,
+                           NgoProfileRepository ngoProfileRepository,
+                           ProfileService profileService,
+                           ImpactService impactService) {
+        this.matchRepository = matchRepository;
+        this.caseRepository = caseRepository;
+        this.lawyerProfileRepository = lawyerProfileRepository;
+        this.ngoProfileRepository = ngoProfileRepository;
+        this.profileService = profileService;
+        this.impactService = impactService;
+    }
 
     @Transactional
     public void generateMatchesForCase(Long caseId) {
         Case legalCase = caseRepository.findById(caseId)
                 .orElseThrow(() -> new RuntimeException("Case not found"));
 
-        // Get all lawyers and NGOs
         List<LawyerProfile> lawyers = lawyerProfileRepository.findAll();
         List<NgoProfile> ngos = ngoProfileRepository.findAll();
 
@@ -32,25 +44,25 @@ public class MatchingService {
 
         for (LawyerProfile lawyer : lawyers) {
             double score = calculateScore(legalCase, lawyer.getSpecialization(), lawyer.getLocation(), lawyer.isVerified());
-            if (score > 40) { // Threshold
-                matches.add(Match.builder()
-                        .legalCase(legalCase)
-                        .matchedUser(lawyer.getUser())
-                        .score(score)
-                        .matchStatus("PENDING")
-                        .build());
+            if (score > 40) {
+                Match match = new Match();
+                match.setLegalCase(legalCase);
+                match.setMatchedUser(lawyer.getUser());
+                match.setScore(score);
+                match.setMatchStatus("PENDING");
+                matches.add(match);
             }
         }
 
         for (NgoProfile ngo : ngos) {
             double score = calculateScore(legalCase, ngo.getSpecialization(), ngo.getLocation(), ngo.isVerified());
             if (score > 40) {
-                matches.add(Match.builder()
-                        .legalCase(legalCase)
-                        .matchedUser(ngo.getUser())
-                        .score(score)
-                        .matchStatus("PENDING")
-                        .build());
+                Match match = new Match();
+                match.setLegalCase(legalCase);
+                match.setMatchedUser(ngo.getUser());
+                match.setScore(score);
+                match.setMatchStatus("PENDING");
+                matches.add(match);
             }
         }
 
@@ -59,7 +71,6 @@ public class MatchingService {
 
     private double calculateScore(Case legalCase, String specialization, String location, boolean verified) {
         double score = 0;
-        // Simple scoring logic
         if (specialization != null && specialization.toLowerCase().contains(legalCase.getCategory().toLowerCase())) {
             score += 50;
         }
@@ -77,14 +88,12 @@ public class MatchingService {
         List<Match> matches;
 
         if (currentUser.getRole() == Role.CITIZEN) {
-            // Find matches for all cases submitted by this citizen
             List<Case> userCases = caseRepository.findByUser(currentUser);
             matches = new ArrayList<>();
             for (Case c : userCases) {
                 matches.addAll(matchRepository.findByLegalCase_Id(c.getId()));
             }
         } else {
-            // Find matches assigned to this lawyer/ngo
             matches = matchRepository.findByMatchedUser(currentUser);
         }
 
@@ -99,7 +108,42 @@ public class MatchingService {
         if (status.equals("ACCEPTED")) {
             match.getLegalCase().setStatus("MATCHED");
             caseRepository.save(match.getLegalCase());
+            impactService.logCaseTaken(match.getMatchedUser());
         }
+        return mapToResponse(matchRepository.save(match));
+    }
+
+    @Transactional
+    public MatchResponse sendChatRequest(Long matchId, com.legalmatch.backend.dto.ChatRequestDTO request) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        match.setMatchStatus("REQUESTED");
+        match.setRequestMessage(request.getMessage());
+        match.setAttachmentUrl(request.getAttachmentUrl());
+        return mapToResponse(matchRepository.save(match));
+    }
+
+    @Transactional
+    public MatchResponse approveChatRequest(Long matchId) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        match.setMatchStatus("APPROVED");
+        
+        // Also update case status
+        match.getLegalCase().setStatus("MATCHED");
+        caseRepository.save(match.getLegalCase());
+        
+        // Log impact
+        impactService.logCaseTaken(match.getMatchedUser());
+        
+        return mapToResponse(matchRepository.save(match));
+    }
+
+    @Transactional
+    public MatchResponse rejectChatRequest(Long matchId) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        match.setMatchStatus("REJECTED");
         return mapToResponse(matchRepository.save(match));
     }
 
@@ -129,18 +173,20 @@ public class MatchingService {
             specialization = matchedUser.getNgoProfile().getSpecialization();
         }
 
-        return MatchResponse.builder()
-                .matchId(match.getMatchId())
-                .caseId(match.getLegalCase().getId())
-                .caseTitle(match.getLegalCase().getTitle())
-                .matchedUserId(matchedUser.getId())
-                .matchedUserName(matchedUser.getName())
-                .matchedUserRole(matchedUser.getRole().toString())
-                .specialization(specialization)
-                .matchStatus(match.getMatchStatus())
-                .lawyerApprovedChat(match.isLawyerApprovedChat())
-                .ngoApprovedChat(match.isNgoApprovedChat())
-                .score(match.getScore())
-                .build();
+        MatchResponse response = new MatchResponse();
+        response.setMatchId(match.getMatchId());
+        response.setCaseId(match.getLegalCase().getId());
+        response.setCaseTitle(match.getLegalCase().getTitle());
+        response.setMatchedUserId(matchedUser.getId());
+        response.setMatchedUserName(matchedUser.getName());
+        response.setMatchedUserRole(matchedUser.getRole().toString());
+        response.setSpecialization(specialization);
+        response.setMatchStatus(match.getMatchStatus());
+        response.setLawyerApprovedChat(match.isLawyerApprovedChat());
+        response.setNgoApprovedChat(match.isNgoApprovedChat());
+        response.setScore(match.getScore());
+        response.setRequestMessage(match.getRequestMessage());
+        response.setAttachmentUrl(match.getAttachmentUrl());
+        return response;
     }
 }

@@ -3,7 +3,6 @@ package com.legalmatch.backend.controller;
 import com.legalmatch.backend.dto.CaseResponse;
 import com.legalmatch.backend.entity.Case;
 import com.legalmatch.backend.service.CaseService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +11,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cases")
-@RequiredArgsConstructor
 public class CaseController {
 
     private final CaseService caseService;
+
+    public CaseController(CaseService caseService) {
+        this.caseService = caseService;
+    }
 
     @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping

@@ -5,17 +5,22 @@ import com.legalmatch.backend.entity.Case;
 import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.repository.CaseRepository;
 import com.legalmatch.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final MatchingService matchingService;
+
+    public CaseService(CaseRepository caseRepository, UserRepository userRepository, MatchingService matchingService) {
+        this.caseRepository = caseRepository;
+        this.userRepository = userRepository;
+        this.matchingService = matchingService;
+    }
 
     // convert entity → DTO
     private CaseResponse mapToResponse(Case c) {
@@ -30,6 +35,16 @@ public class CaseService {
         response.setCreatedAt(c.getCreatedAt());
         response.setUpdatedAt(c.getUpdatedAt());
         response.setUserEmail(c.getUser().getEmail());
+        response.setLocation(c.getLocation());
+        response.setKeywords(c.getKeywords());
+        response.setDateTime(c.getDateTime());
+        response.setContactInfo(c.getContactInfo());
+        response.setOtherPartyName(c.getOtherPartyName());
+        response.setOtherPartyLocation(c.getOtherPartyLocation());
+        response.setOtherPartyContact(c.getOtherPartyContact());
+        response.setOtherPartyRepresentative(c.getOtherPartyRepresentative());
+        response.setInvestigatingOfficer(c.getInvestigatingOfficer());
+        response.setWitnesses(c.getWitnesses());
 
         return response;
     }
@@ -44,6 +59,9 @@ public class CaseService {
         caseRequest.setStatus("SUBMITTED");
 
         Case savedCase = caseRepository.save(caseRequest);
+
+        // Auto-generate matches based on the new case
+        matchingService.generateMatchesForCase(savedCase.getId());
 
         return mapToResponse(savedCase);
     }

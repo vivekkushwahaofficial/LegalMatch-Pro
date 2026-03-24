@@ -19,10 +19,7 @@ import com.legalmatch.backend.repository.NgoProfileRepository;
 import com.legalmatch.backend.repository.UserRepository;
 import com.legalmatch.backend.security.JwtService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -30,6 +27,18 @@ public class AuthService {
     private final NgoProfileRepository ngoProfileRepository;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthService(UserRepository userRepository,
+                       LawyerProfileRepository lawyerProfileRepository,
+                       NgoProfileRepository ngoProfileRepository,
+                       JwtService jwtService,
+                       BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.lawyerProfileRepository = lawyerProfileRepository;
+        this.ngoProfileRepository = ngoProfileRepository;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public String register(RegisterRequest request) {
 

@@ -1,23 +1,9 @@
 package com.legalmatch.backend.entity;
 
 import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -48,5 +34,30 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private NgoProfile ngoProfile;
 
-}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
+    public LocalDateTime getSubmittedDate() { return submittedDate; }
+    public void setSubmittedDate(LocalDateTime submittedDate) { this.submittedDate = submittedDate; }
+
+    public VerificationStatus getStatus() { return status; }
+    public void setStatus(VerificationStatus status) { this.status = status; }
+
+    public LawyerProfile getLawyerProfile() { return lawyerProfile; }
+    public void setLawyerProfile(LawyerProfile lawyerProfile) { this.lawyerProfile = lawyerProfile; }
+
+    public NgoProfile getNgoProfile() { return ngoProfile; }
+    public void setNgoProfile(NgoProfile ngoProfile) { this.ngoProfile = ngoProfile; }
+}

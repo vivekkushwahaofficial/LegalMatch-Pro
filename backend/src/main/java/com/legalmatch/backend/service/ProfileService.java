@@ -8,13 +8,14 @@ import com.legalmatch.backend.dto.ProfileUpdateRequest;
 import com.legalmatch.backend.entity.*;
 import com.legalmatch.backend.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class ProfileService {
 
     private final UserRepository userRepository;
+
+    public ProfileService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public ProfileResponse getMyProfile(String email) {
 

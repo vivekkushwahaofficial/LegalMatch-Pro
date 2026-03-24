@@ -84,7 +84,7 @@ const CaseSubmission = () => {
       if (!formData.description.trim()) newErrors.description = 'Description is required';
       if (!formData.caseCategory) newErrors.caseCategory = 'Case Category is required';
       if (!formData.relatedKeywords.trim()) newErrors.relatedKeywords = 'Keywords/Sub-categories are required';
-      if (!formData.dateTime) newErrors.dateTime = 'Date and Time are required';
+
       if (!formData.caseLocation.trim()) newErrors.caseLocation = 'Case Location is required';
       if (!formData.userContactInfo.trim()) newErrors.userContactInfo = 'User Contact Info is required';
     }
@@ -100,8 +100,7 @@ const CaseSubmission = () => {
     }
 
     if (step === 3) {
-      if (!firFile) newErrors.firFile = 'FIR document is required';
-      if (!caseDocsFile) newErrors.caseDocsFile = 'Case Documents are required';
+      // Both documents are optional
     }
 
     setErrors(newErrors);
@@ -117,6 +116,8 @@ const CaseSubmission = () => {
   const handleBack = () => {
     setCurrentStep(prev => prev - 1);
   };
+
+  const [submittedCase, setSubmittedCase] = useState(null);
 
   const handleSubmitForm = async () => {
 
@@ -134,7 +135,6 @@ const CaseSubmission = () => {
         keywords: formData.relatedKeywords,
         status: formData.currentStatus,
 
-        dateTime: formData.dateTime,
         contactInfo: formData.userContactInfo,
         otherPartyName: formData.otherPartyName,
         otherPartyLocation: formData.otherPartyLocation,
@@ -148,6 +148,7 @@ const CaseSubmission = () => {
 
       console.log("Case submitted:", response);
 
+      setSubmittedCase(response);
       setSubmitted(true);
 
     } catch (error) {
@@ -164,37 +165,134 @@ const CaseSubmission = () => {
 
   const steps = ['Case Details', 'Other Party & Status', 'Evidence', 'Review'];
 
-  if (submitted) {
+  if (submitted && submittedCase) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-16">
+      <div className="max-w-3xl mx-auto py-10">
 
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-green-600 text-2xl">✓</span>
+        {/* Success Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-green-600 text-2xl">✓</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            Case Submitted Successfully!
+          </h2>
+          <p className="text-gray-500 text-sm">
+            Case ID: <span className="font-bold text-indigo-600">#{submittedCase.id}</span> — Status: <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs font-bold">{submittedCase.status}</span>
+          </p>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Case Submitted Successfully!
-        </h2>
+        {/* Submitted Case Details Card */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+          <h3 className="font-bold text-gray-900 text-lg mb-4 border-b pb-2">Submitted Case Details</h3>
 
-        <p className="text-gray-500 mb-6">
-          Your case has been submitted. You will be matched with a lawyer shortly.
-        </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+            <div className="space-y-3">
+              <div className="flex justify-between border-b border-gray-50 pb-1">
+                <span className="text-gray-500">Title</span>
+                <span className="text-gray-900 font-medium">{submittedCase.title}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-50 pb-1">
+                <span className="text-gray-500">Category</span>
+                <span className="text-gray-900 font-medium">{submittedCase.category}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-50 pb-1">
+                <span className="text-gray-500">Keywords</span>
+                <span className="text-gray-900 font-medium">{submittedCase.keywords}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-50 pb-1">
+                <span className="text-gray-500">Location</span>
+                <span className="text-gray-900 font-medium">{submittedCase.location}</span>
+              </div>
+              <div className="flex justify-between pb-1">
+                <span className="text-gray-500">Contact</span>
+                <span className="text-gray-900 font-medium">{submittedCase.contactInfo}</span>
+              </div>
+            </div>
 
-        <button
-          onClick={() => navigate("/citizen")}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium"
-        >
-          Back to Dashboard
-        </button>
+            <div className="space-y-3">
+              {submittedCase.otherPartyName && (
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span className="text-gray-500">Other Party</span>
+                  <span className="text-gray-900 font-medium">{submittedCase.otherPartyName}</span>
+                </div>
+              )}
+              {submittedCase.otherPartyLocation && (
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span className="text-gray-500">Other Party Location</span>
+                  <span className="text-gray-900 font-medium">{submittedCase.otherPartyLocation}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-b border-gray-50 pb-1">
+                <span className="text-gray-500">Status</span>
+                <span className="text-gray-900 font-medium">{submittedCase.status}</span>
+              </div>
+              {submittedCase.investigatingOfficer && (
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span className="text-gray-500">Inv. Officer</span>
+                  <span className="text-gray-900 font-medium">{submittedCase.investigatingOfficer}</span>
+                </div>
+              )}
+              {submittedCase.witnesses && (
+                <div className="flex justify-between pb-1">
+                  <span className="text-gray-500">Witnesses</span>
+                  <span className="text-gray-900 font-medium">{submittedCase.witnesses}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {submittedCase.description && (
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Description</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap">{submittedCase.description}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate("/citizen/matches")}
+            className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors shadow-sm"
+          >
+            🤝 View Matches for This Case
+          </button>
+
+          <button
+            onClick={() => navigate("/citizen/cases")}
+            className="flex-1 px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors"
+          >
+            📂 View Previous Cases
+          </button>
+
+          <button
+            onClick={() => navigate("/citizen")}
+            className="flex-1 px-6 py-3 bg-white text-gray-500 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors"
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
 
       </div>
     );
   }
 
+
   return (
     <div className="max-w-4xl mx-auto pb-10">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Case Submission</h1>
-      <p className="text-gray-500 text-sm mb-6">Fill in the necessary details to submit your case.</p>
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Case Submission</h1>
+          <p className="text-gray-500 text-sm">Fill in the necessary details to submit your case.</p>
+        </div>
+        <button
+          onClick={() => navigate("/citizen/cases")}
+          className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+        >
+          📂 View Previous Cases
+        </button>
+      </div>
 
       {/* Step Indicator */}
       <div className="flex items-center mb-8">
@@ -282,19 +380,7 @@ const CaseSubmission = () => {
               {errors.relatedKeywords && <p className="text-xs text-red-500 mt-1">{errors.relatedKeywords}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date and Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                name="dateTime"
-                type="datetime-local"
-                value={formData.dateTime}
-                onChange={handleChange}
-                className={`w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.dateTime ? 'border-red-400' : 'border-gray-300'}`}
-              />
-              {errors.dateTime && <p className="text-xs text-red-500 mt-1">{errors.dateTime}</p>}
-            </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -453,7 +539,7 @@ const CaseSubmission = () => {
             {/* FIR Upload */}
             <div className="border border-gray-300 rounded-lg p-6 text-center bg-gray-50">
               <h3 className="text-sm font-semibold mb-2">
-                FIR Document <span className="text-red-500">*</span>
+                FIR Document <span className="text-gray-400 font-normal">(Optional)</span>
               </h3>
               <p className="text-gray-400 text-xs mb-4">First Information Report (PDF, JPG)</p>
               <input
@@ -477,7 +563,7 @@ const CaseSubmission = () => {
             {/* Case Documents Upload */}
             <div className="border border-gray-300 rounded-lg p-6 text-center bg-gray-50">
               <h3 className="text-sm font-semibold mb-2">
-                Case Documents <span className="text-red-500">*</span>
+                Case Documents <span className="text-gray-400 font-normal">(Optional)</span>
               </h3>
               <p className="text-gray-400 text-xs mb-4">Charge Sheets, Legal Notices, etc. (PDF, ZIP)</p>
               <input
@@ -520,10 +606,6 @@ const CaseSubmission = () => {
               <div className="flex justify-between border-b border-gray-100 pb-1">
                 <span className="text-gray-500">Keywords</span>
                 <span className="text-gray-900 font-medium truncate max-w-[120px]" title={formData.relatedKeywords}>{formData.relatedKeywords}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-100 pb-1">
-                <span className="text-gray-500">Date/Time</span>
-                <span className="text-gray-900 font-medium">{new Date(formData.dateTime).toLocaleString()}</span>
               </div>
               <div className="flex justify-between border-b border-gray-100 pb-1">
                 <span className="text-gray-500">Location</span>

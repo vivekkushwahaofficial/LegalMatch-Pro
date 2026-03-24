@@ -4,7 +4,6 @@ import com.legalmatch.backend.dto.LoginRequest;
 import com.legalmatch.backend.dto.RegisterRequest;
 import com.legalmatch.backend.service.AuthService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -12,10 +11,13 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
     public String register(@Valid @RequestBody RegisterRequest request) {

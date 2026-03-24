@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function NGODashboard() {
 
@@ -38,6 +39,11 @@ export default function NGODashboard() {
       <h1 className="text-2xl font-semibold mb-6">
         NGO Dashboard
       </h1>
+
+      <Link to="/ngo/requests" className="block mb-8 bg-blue-600 p-6 rounded-xl shadow-md border border-blue-700 text-white hover:bg-blue-700 transition-all">
+          <h3 className="font-bold text-lg">Communication Requests</h3>
+          <p className="text-sm opacity-90 mt-2">Manage incoming chat requests from individuals seeking legal aid.</p>
+      </Link>
 
       {cases.length === 0 ? (
         <p>No assigned cases</p>

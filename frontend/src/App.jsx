@@ -3,8 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+import LandingPage from "./pages/LandingPage";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
+import LawyerDirectory from "./pages/directory/LawyerDirectory";
+import NgoDirectory from "./pages/directory/NgoDirectory";
 
 import CitizenDashboard from "./pages/dashboard/CitizenDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
@@ -15,13 +18,12 @@ import CaseSubmission from "./pages/cases/CaseSubmission";
 import CaseList from "./pages/cases/CaseList";
 import CaseDetail from "./pages/cases/CaseDetail";
 
-import LawyerDirectory from "./pages/directory/LawyerDirectory";
-import NgoDirectory from "./pages/directory/NgoDirectory";
 import Matching from "./pages/matching/Matches";
 
 import LawyerProfile from "./pages/profiles/LawyerProfile";
 import AssignedCases from "./components/cases/AssignedCases";
 import ChatPage from "./pages/chat/ChatPage";
+import RequestsInbox from "./pages/chat/RequestsInbox";
 import Profile from "./pages/profiles/Profile";
 
 function App() {
@@ -30,7 +32,9 @@ function App() {
       <Routes>
 
         {/* Public Routes */}
-        <Route path="/" element={<Signin />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/directories/lawyers" element={<LawyerDirectory />} />
+        <Route path="/directories/ngos" element={<NgoDirectory />} />
         <Route path="/login" element={<Signin />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Signup />} />
@@ -58,6 +62,7 @@ function App() {
           }
         >
           <Route index element={<LawyerDashboard />} />
+          <Route path="requests" element={<RequestsInbox />} />
           <Route path="directory" element={<LawyerDirectory />} />
         </Route>
 
@@ -91,6 +96,7 @@ function App() {
           }
         >
           <Route index element={<NGODashboard />} />
+          <Route path="requests" element={<RequestsInbox />} />
         </Route>
 
         {/* Other */}

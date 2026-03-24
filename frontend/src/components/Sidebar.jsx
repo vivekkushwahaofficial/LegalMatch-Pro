@@ -15,7 +15,8 @@ import {
   Building2,
   Search,
   BarChart,
-  FolderOpen
+  FolderOpen,
+  ClipboardList
 } from 'lucide-react';
 
 const Sidebar = ({ role }) => {
@@ -58,9 +59,10 @@ const Sidebar = ({ role }) => {
         return [
           { name: 'Profile Management', path: '/citizen/profile', icon: User },
           { name: 'Case Submission', path: '/citizen/submit-case', icon: FolderOpen },
+          { name: 'Previous Cases', path: '/citizen/cases', icon: ClipboardList },
           { name: 'Directory', path: '/citizen/lawyers', icon: Search },
           { name: 'Matches', path: '/citizen/matches', icon: Shield },
-          { name: 'Impact Dashboard', path: '/citizen', icon: BarChart }, // temporary
+          { name: 'Impact Dashboard', path: '/citizen', icon: BarChart },
         ];
       default: return [];
     }

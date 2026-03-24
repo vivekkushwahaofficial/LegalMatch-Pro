@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const LawyerDashboard = () => {
     return (
         <div className="p-4">
@@ -13,6 +15,10 @@ const LawyerDashboard = () => {
                     <h3 className="font-semibold text-lg">New Inquiries</h3>
                     <p className="text-3xl font-bold mt-2">5</p>
                 </div>
+                <Link to="/lawyer/requests" className="bg-blue-600 p-6 rounded-xl shadow-md border border-blue-700 text-white hover:bg-blue-700 transition-all">
+                    <h3 className="font-bold text-lg">Connection Requests</h3>
+                    <p className="text-sm opacity-90 mt-2">Review and approve new chat requests from clients.</p>
+                </Link>
             </div>
         </div>
     );

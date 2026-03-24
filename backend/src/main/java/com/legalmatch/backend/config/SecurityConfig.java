@@ -13,14 +13,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.legalmatch.backend.security.JwtAuthenticationFilter;
 
-import lombok.RequiredArgsConstructor;
-
 @EnableMethodSecurity
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -41,16 +42,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 // Allow browser preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Public APIs
+                // Public APIs (Relaxed for testing as requested)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/api/cases/**").permitAll() // 👈 Temporarily public
+                .requestMatchers("/api/directory/**").permitAll() // 👈 Temporarily public
+                
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
                 // Authenticated users
                 .requestMatchers("/api/profile/**").authenticated()
-                .requestMatchers("/api/cases/**").authenticated()
-                .requestMatchers("/api/directory/**").authenticated()
                 .requestMatchers("/api/matches/**").authenticated()
+                
                 // Everything else requires login
                 .anyRequest().authenticated()
                 )

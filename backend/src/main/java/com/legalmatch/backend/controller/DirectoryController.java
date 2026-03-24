@@ -2,82 +2,100 @@ package com.legalmatch.backend.controller;
 
 import com.legalmatch.backend.dto.LawyerDirectoryResponse;
 import com.legalmatch.backend.dto.NgoDirectoryResponse;
+import com.legalmatch.backend.entity.LawyerDirectory;
 import com.legalmatch.backend.entity.LawyerProfile;
+import com.legalmatch.backend.entity.NgoDirectory;
 import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.service.DirectoryService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/directory")
-@RequiredArgsConstructor
 public class DirectoryController {
 
     private final DirectoryService directoryService;
 
+    public DirectoryController(DirectoryService directoryService) {
+        this.directoryService = directoryService;
+    }
+
     @GetMapping("/lawyers")
     public List<LawyerDirectoryResponse> getLawyers(
-
             @RequestParam(required = false) String specialization,
-            @RequestParam(required = false) String location,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(required = false) String location
     ) {
+        List<LawyerDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<LawyerProfile> lawyers;
+        List<LawyerProfile> profiles = directoryService.searchLawyers(specialization, location);
+        mergedList.addAll(profiles.stream().map(this::mapLawyerProfile).collect(Collectors.toList()));
 
-        // if search filters exist
-        if (specialization != null || location != null) {
-            lawyers = directoryService.searchLawyers(specialization, location);
-        }
+        List<LawyerDirectory> directoryLawyers = directoryService.getAllDirectoryLawyers();
+        mergedList.addAll(directoryLawyers.stream()
+                .filter(l -> (specialization == null || l.getExpertise().equalsIgnoreCase(specialization))
+                          && (location == null || l.getLocation().equalsIgnoreCase(location)))
+                .map(this::mapLawyerDirectory)
+                .collect(Collectors.toList()));
 
-        // otherwise use pagination
-        else {
-            Page<LawyerProfile> lawyerPage =
-                    directoryService.getLawyers(page, size);
-
-            lawyers = lawyerPage.getContent();
-        }
-
-        return lawyers.stream()
-                .map(this::mapLawyer)
-                .toList();
+        return mergedList;
     }
 
     @GetMapping("/ngos")
     public List<NgoDirectoryResponse> getNgos(
             @RequestParam(required = false) String location
     ) {
+        List<NgoDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<NgoProfile> ngos = directoryService.getNgos(location);
+        List<NgoProfile> profiles = directoryService.getNgos(location);
+        mergedList.addAll(profiles.stream().map(this::mapNgoProfile).collect(Collectors.toList()));
 
-        return ngos.stream()
-                .map(this::mapNgo)
-                .toList();
+        List<NgoDirectory> directoryNgos = directoryService.getAllDirectoryNgos();
+        mergedList.addAll(directoryNgos.stream()
+                .filter(n -> (location == null || n.getLocation().equalsIgnoreCase(location)))
+                .map(this::mapNgoDirectory)
+                .collect(Collectors.toList()));
+
+        return mergedList;
     }
 
-    private LawyerDirectoryResponse mapLawyer(LawyerProfile lawyer) {
-
+    private LawyerDirectoryResponse mapLawyerProfile(LawyerProfile profile) {
         LawyerDirectoryResponse dto = new LawyerDirectoryResponse();
-
-        dto.setSpecialization(lawyer.getSpecialization());
-        dto.setLocation(lawyer.getLocation());
-        dto.setVerified(lawyer.isVerified());
-
+        dto.setName(profile.getUser().getName());
+        dto.setSpecialization(profile.getSpecialization());
+        dto.setLocation(profile.getLocation());
+        dto.setVerified(profile.isVerified());
+        dto.setOrganizationDetails("Registered Member");
         return dto;
     }
 
-    private NgoDirectoryResponse mapNgo(NgoProfile ngo) {
+    private LawyerDirectoryResponse mapLawyerDirectory(LawyerDirectory dir) {
+        LawyerDirectoryResponse dto = new LawyerDirectoryResponse();
+        dto.setName(dir.getName());
+        dto.setSpecialization(dir.getExpertise());
+        dto.setLocation(dir.getLocation());
+        dto.setVerified(dir.getVerified() != null && dir.getVerified());
+        dto.setOrganizationDetails(dir.getOrganizationDetails());
+        return dto;
+    }
 
+    private NgoDirectoryResponse mapNgoProfile(NgoProfile profile) {
         NgoDirectoryResponse dto = new NgoDirectoryResponse();
+        dto.setNgoName(profile.getNgoName());
+        dto.setLocation(profile.getLocation());
+        dto.setVerified(profile.isVerified());
+        dto.setOrganizationDetails("Registered Member");
+        return dto;
+    }
 
-        dto.setNgoName(ngo.getNgoName());
-        dto.setLocation(ngo.getLocation());
-        dto.setVerified(ngo.isVerified());
-
+    private NgoDirectoryResponse mapNgoDirectory(NgoDirectory dir) {
+        NgoDirectoryResponse dto = new NgoDirectoryResponse();
+        dto.setNgoName(dir.getName());
+        dto.setLocation(dir.getLocation());
+        dto.setVerified(dir.getVerified() != null && dir.getVerified());
+        dto.setOrganizationDetails(dir.getOrganizationDetails());
         return dto;
     }
 }

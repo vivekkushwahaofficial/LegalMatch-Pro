@@ -11,68 +11,68 @@ public class CaseResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String userEmail;
+    private String location;
+    private String keywords;
+    private String dateTime;
+    private String contactInfo;
+    private String otherPartyName;
+    private String otherPartyLocation;
+    private String otherPartyContact;
+    private String otherPartyRepresentative;
+    private String investigatingOfficer;
+    private String witnesses;
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getCategory() {
-        return category;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public String getUserEmail() { return userEmail; }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getKeywords() { return keywords; }
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public String getDateTime() { return dateTime; }
+    public void setDateTime(String dateTime) { this.dateTime = dateTime; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getContactInfo() { return contactInfo; }
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public String getOtherPartyName() { return otherPartyName; }
+    public void setOtherPartyName(String otherPartyName) { this.otherPartyName = otherPartyName; }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public String getOtherPartyLocation() { return otherPartyLocation; }
+    public void setOtherPartyLocation(String otherPartyLocation) { this.otherPartyLocation = otherPartyLocation; }
 
-    public String getUserEmail() {
-        return userEmail;
-    }
+    public String getOtherPartyContact() { return otherPartyContact; }
+    public void setOtherPartyContact(String otherPartyContact) { this.otherPartyContact = otherPartyContact; }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
+    public String getOtherPartyRepresentative() { return otherPartyRepresentative; }
+    public void setOtherPartyRepresentative(String otherPartyRepresentative) { this.otherPartyRepresentative = otherPartyRepresentative; }
+
+    public String getInvestigatingOfficer() { return investigatingOfficer; }
+    public void setInvestigatingOfficer(String investigatingOfficer) { this.investigatingOfficer = investigatingOfficer; }
+
+    public String getWitnesses() { return witnesses; }
+    public void setWitnesses(String witnesses) { this.witnesses = witnesses; }
 }
