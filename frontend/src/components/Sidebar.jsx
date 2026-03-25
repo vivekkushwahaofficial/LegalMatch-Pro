@@ -16,7 +16,9 @@ import {
   Search,
   BarChart,
   FolderOpen,
-  ClipboardList
+  ClipboardList,
+  MessageCircle
+
 } from 'lucide-react';
 
 const Sidebar = ({ role }) => {
@@ -63,6 +65,7 @@ const Sidebar = ({ role }) => {
           { name: 'Directory', path: '/citizen/lawyers', icon: Search },
           { name: 'Matches', path: '/citizen/matches', icon: Shield },
           { name: 'Impact Dashboard', path: '/citizen', icon: BarChart },
+          { name: 'Chat', path: '/chat', icon: MessageCircle },
         ];
       default: return [];
     }
@@ -123,10 +126,6 @@ const Sidebar = ({ role }) => {
             </NavLink>
           ))}
         </nav>
-
-        <NavLink to={`/${role}/chat`}>
-          Chat
-        </NavLink>
 
         {/* User Profile (Bottom) */}
         <div className="p-4 border-t border-slate-100">
