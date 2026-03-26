@@ -7,24 +7,34 @@ const LawyerDirectory = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchLawyers = async () => {
-            try {
-                // Assuming an endpoint that returns all lawyers
-                const response = await axios.get('/api/directory/lawyers');
-                setLawyers(response.data);
-            } catch (error) {
-                console.error('Error fetching lawyers:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchLawyers();
-    }, []);
+useEffect(() => {
+    const fetchLawyers = async () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await axios.get(
+                "http://localhost:8080/api/directory/lawyers",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setLawyers(response.data);
+
+        } catch (error) {
+            console.error('Error fetching lawyers:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchLawyers();
+}, []);
 
     const filteredLawyers = lawyers.filter(lawyer => 
         lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lawyer.expertise.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lawyer.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
         lawyer.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -66,7 +76,7 @@ const LawyerDirectory = () => {
                                 )}
                             </div>
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">{lawyer.name}</h3>
-                            <p className="text-indigo-600 font-bold text-sm uppercase tracking-wider mb-6">{lawyer.expertise}</p>
+                            <p className="text-indigo-600 font-bold text-sm uppercase tracking-wider mb-6">{lawyer.specialization}</p>
                             
                             <div className="space-y-4 mb-8">
                                 <div className="flex items-center gap-3 text-gray-500 font-medium">
