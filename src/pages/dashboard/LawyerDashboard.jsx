@@ -1,0 +1,27 @@
+import { Link } from "react-router-dom";
+
+const LawyerDashboard = () => {
+    return (
+        <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Lawyer Dashboard</h1>
+            <p>Welcome to the Lawyer Dashboard.</p>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Placeholder cards */}
+                <div className="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 className="font-semibold text-lg">My Active Cases</h3>
+                    <p className="text-3xl font-bold mt-2">12</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 className="font-semibold text-lg">New Inquiries</h3>
+                    <p className="text-3xl font-bold mt-2">5</p>
+                </div>
+                <Link to="/lawyer/requests" className="bg-blue-600 p-6 rounded-xl shadow-md border border-blue-700 text-white hover:bg-blue-700 transition-all">
+                    <h3 className="font-bold text-lg">Connection Requests</h3>
+                    <p className="text-sm opacity-90 mt-2">Review and approve new chat requests from clients.</p>
+                </Link>
+            </div>
+        </div>
+    );
+};
+
+export default LawyerDashboard;
