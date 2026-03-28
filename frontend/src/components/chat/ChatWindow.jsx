@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { apiCall } from "../../api/apiConfig";
+import { apiCall, getValidAccessToken } from "../../api/apiConfig";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import { MessageCircle, Send, MoreHorizontal, Info } from "lucide-react";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 
 const ChatWindow = ({ match }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
 
   useEffect(() => {
     if (match) {
@@ -14,11 +17,82 @@ const ChatWindow = ({ match }) => {
     }
   }, [match]);
 
+  useEffect(() => {
+    if (!match) return;
+
+    const matchId = match.id || match.matchId;
+    if (!matchId) return;
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+      reconnectDelay: 3000,
+      debug: () => { },
+    });
+
+    client.beforeConnect = async () => {
+      const token = await getValidAccessToken();
+      if (!token) {
+        throw new Error("Missing access token for websocket connection");
+      }
+
+      client.configure({
+        connectHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+
+    client.onConnect = () => {
+      setIsRealtimeConnected(true);
+
+      client.subscribe(`/topic/chats/${matchId}`, (frame) => {
+        try {
+          const incoming = JSON.parse(frame.body);
+          setMessages((prev) => {
+            // Prevent duplicate append if message already exists from polling refresh.
+            if (prev.some((m) => m.id && incoming.id && m.id === incoming.id)) {
+              return prev;
+            }
+            return [...prev, incoming];
+          });
+        } catch (err) {
+          console.error("Failed to parse realtime message", err);
+        }
+      });
+    };
+
+    client.onStompError = () => {
+      setIsRealtimeConnected(false);
+    };
+
+    client.onWebSocketClose = () => {
+      setIsRealtimeConnected(false);
+    };
+
+    client.activate();
+
+    return () => {
+      setIsRealtimeConnected(false);
+      try {
+        client.deactivate();
+      } catch (_) {
+        // noop
+      }
+    };
+  }, [match?.id, match?.matchId]);
+
   const fetchMessages = async () => {
     try {
       setLoading(true);
       const data = await apiCall(`/chats/${match.id || match.matchId}`, "GET");
-      setMessages(data);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.messages)
+          ? data.messages
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
+      setMessages(list);
     } catch (error) {
       console.error("Failed to load messages", error);
     } finally {
@@ -55,7 +129,9 @@ const ChatWindow = ({ match }) => {
             <h3 className="font-bold text-gray-900 leading-tight">
               {match.providerName || match.matchedUserName}
             </h3>
-            <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Active Now</p>
+            <p className={`text-[10px] font-black uppercase tracking-widest ${isRealtimeConnected ? "text-green-600" : "text-gray-400"}`}>
+              {isRealtimeConnected ? "Online" : "Offline"}
+            </p>
           </div>
         </div>
 
@@ -83,9 +159,9 @@ const ChatWindow = ({ match }) => {
           </div>
         ) : (
           (messages || []).map((msg, index) => (
-            <MessageBubble 
-              key={msg.id || index} 
-              message={msg} 
+            <MessageBubble
+              key={msg.id || index}
+              message={msg}
               isOwn={msg.senderId === Number(localStorage.getItem("userId"))}
             />
           ))

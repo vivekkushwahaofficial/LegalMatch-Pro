@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -25,11 +25,29 @@ import AssignedCases from "./components/cases/AssignedCases";
 import ChatPage from "./pages/chat/ChatPage";
 import RequestsInbox from "./pages/chat/RequestsInbox";
 import Profile from "./pages/profiles/Profile";
+import AppointmentsPage from "./pages/appointments/AppointmentsPage";
+
+const ChatAliasRedirect = () => {
+  const role = (localStorage.getItem("role") || "").toUpperCase();
+  if (role === "LAWYER") return <Navigate to="/lawyer/chat" replace />;
+  if (role === "NGO") return <Navigate to="/ngo/chat" replace />;
+  return <Navigate to="/citizen/chat" replace />;
+};
 
 function App() {
   return (
     <Router>
       <Routes>
+
+        {/* Route aliases (legacy links) */}
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute>
+              <ChatAliasRedirect />
+            </PrivateRoute>
+          }
+        />
 
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
@@ -64,6 +82,8 @@ function App() {
           <Route index element={<LawyerDashboard />} />
           <Route path="requests" element={<RequestsInbox />} />
           <Route path="directory" element={<LawyerDirectory />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
         </Route>
 
         {/* Citizen */}
@@ -84,6 +104,7 @@ function App() {
           <Route path="ngos" element={<NgoDirectory />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="matches" element={<Matching />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
         </Route>
 
         {/* NGO */}
@@ -97,6 +118,8 @@ function App() {
         >
           <Route index element={<NGODashboard />} />
           <Route path="requests" element={<RequestsInbox />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
         </Route>
 
         {/* Other */}

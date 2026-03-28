@@ -17,7 +17,8 @@ import {
   BarChart,
   FolderOpen,
   ClipboardList,
-  MessageCircle
+  MessageCircle,
+  CalendarDays
 
 } from 'lucide-react';
 
@@ -31,6 +32,8 @@ const Sidebar = ({ role }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userName");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
 
     // redirect to login page
     navigate("/login");
@@ -40,23 +43,26 @@ const Sidebar = ({ role }) => {
   // Image shows: Profile Management, Case Submission, Directory, Matches, Impact Dashboard, Admin Panel
   // We'll map these somewhat to roles or just show them all for Admin to match the image structure
   const getLinks = (role) => {
-    // For the purpose of "matching the image", we'll use the Admin view as the primary example
-    // but keep the role logic for other users.
     if (role === 'admin') {
       return [
-        { name: 'Profile Management', path: '/admin/profiles', icon: User },
-        { name: 'Case Submission', path: '/admin/cases', icon: FolderOpen },
-        { name: 'Directory', path: '/admin/directory', icon: Search },
-        { name: 'Matches', path: '/admin/matches', icon: Shield },
-        { name: 'Impact Dashboard', path: '/admin/impact', icon: BarChart },
         { name: 'Admin Panel', path: '/admin', icon: Settings },
+        { name: 'Lawyer Directory', path: '/directories/lawyers', icon: Search },
+        { name: 'NGO Directory', path: '/directories/ngos', icon: Building2 },
       ];
     }
 
     // Role specific fallbacks
     switch (role) {
-      case 'lawyer': return [{ name: 'My Cases', path: '/lawyer', icon: Briefcase }];
-      case 'ngo': return [{ name: 'Impact Dashboard', path: '/ngo', icon: Building2 }];
+      case 'lawyer': return [
+        { name: 'My Cases', path: '/lawyer', icon: Briefcase },
+        { name: 'Chat', path: '/lawyer/chat', icon: MessageCircle },
+        { name: 'Appointments', path: '/lawyer/appointments', icon: CalendarDays },
+      ];
+      case 'ngo': return [
+        { name: 'Impact Dashboard', path: '/ngo', icon: Building2 },
+        { name: 'Chat', path: '/ngo/chat', icon: MessageCircle },
+        { name: 'Appointments', path: '/ngo/appointments', icon: CalendarDays },
+      ];
       case 'citizen':
         return [
           { name: 'Profile Management', path: '/citizen/profile', icon: User },
@@ -65,7 +71,8 @@ const Sidebar = ({ role }) => {
           { name: 'Directory', path: '/citizen/lawyers', icon: Search },
           { name: 'Matches', path: '/citizen/matches', icon: Shield },
           { name: 'Impact Dashboard', path: '/citizen', icon: BarChart },
-          { name: 'Chat', path: '/chat', icon: MessageCircle },
+          { name: 'Chat', path: '/citizen/chat', icon: MessageCircle },
+          { name: 'Appointments', path: '/citizen/appointments', icon: CalendarDays },
         ];
       default: return [];
     }

@@ -1,28 +1,38 @@
 import { useState } from "react";
 import TimeSlots from "./TimeSlots";
+import { apiCall } from "../../api/apiConfig";
 
-const ScheduleModal = ({ isOpen, onClose, match }) => {
+const ScheduleModal = ({ isOpen, onClose, match, onScheduled }) => {
 
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
   if (!isOpen) return null;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
 
     if (!date || !time) {
       alert("Please select date and time");
       return;
     }
 
-    console.log("Scheduled:", {
-      matchId: match?.id,
-      date,
-      time
-    });
+    try {
+      await apiCall("/appointments", "POST", {
+        matchId: Number(match?.matchId || match?.id),
+        date,
+        time,
+        status: "SCHEDULED",
+      });
 
-    alert("Appointment Scheduled ✅");
-    onClose();
+      alert("Appointment Scheduled ✅");
+      if (onScheduled) {
+        onScheduled();
+      }
+      onClose();
+    } catch (error) {
+      console.error("Failed to schedule appointment", error);
+      alert(error?.message || "Could not schedule appointment");
+    }
   };
 
   return (

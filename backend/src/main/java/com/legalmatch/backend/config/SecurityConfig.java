@@ -45,16 +45,17 @@ public class SecurityConfig {
                 // Public APIs (Relaxed for testing as requested)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
-                .requestMatchers("/api/cases/**").permitAll() // 👈 Temporarily public
                 .requestMatchers("/api/directory/**").permitAll() // 👈 Temporarily public
-                
+
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                
                 // Authenticated users
+                .requestMatchers("/api/cases/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
                 .requestMatchers("/api/matches/**").authenticated()
-                
+                .requestMatchers("/api/chats/**").authenticated()
+                .requestMatchers("/api/appointments/**").authenticated()
+                .requestMatchers("/api/notifications/**").authenticated()
                 // Everything else requires login
                 .anyRequest().authenticated()
                 )

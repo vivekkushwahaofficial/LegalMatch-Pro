@@ -1,7 +1,16 @@
 package com.legalmatch.backend.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "matches")
@@ -19,6 +28,10 @@ public class Match {
     @JoinColumn(name = "user_id", nullable = false)
     private User matchedUser;
 
+    // Milestone-3 explicit provider fields (kept alongside matchedUser for backward compatibility).
+    private Long providerId;
+    private String providerType; // LAWYER / NGO
+
     private String matchStatus; // PENDING, REQUESTED, APPROVED, REJECTED
     private boolean lawyerApprovedChat;
     private boolean ngoApprovedChat;
@@ -28,47 +41,137 @@ public class Match {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Match() {}
+    public Match() {
+    }
 
-    public Long getMatchId() { return matchId; }
-    public void setMatchId(Long matchId) { this.matchId = matchId; }
+    public Long getMatchId() {
+        return matchId;
+    }
 
-    public Case getLegalCase() { return legalCase; }
-    public void setLegalCase(Case legalCase) { this.legalCase = legalCase; }
+    public void setMatchId(Long matchId) {
+        this.matchId = matchId;
+    }
 
-    public User getMatchedUser() { return matchedUser; }
-    public void setMatchedUser(User matchedUser) { this.matchedUser = matchedUser; }
+    public Case getLegalCase() {
+        return legalCase;
+    }
 
-    public String getMatchStatus() { return matchStatus; }
-    public void setMatchStatus(String matchStatus) { this.matchStatus = matchStatus; }
+    public void setLegalCase(Case legalCase) {
+        this.legalCase = legalCase;
+    }
 
-    public boolean isLawyerApprovedChat() { return lawyerApprovedChat; }
-    public void setLawyerApprovedChat(boolean lawyerApprovedChat) { this.lawyerApprovedChat = lawyerApprovedChat; }
+    public User getMatchedUser() {
+        return matchedUser;
+    }
 
-    public boolean isNgoApprovedChat() { return ngoApprovedChat; }
-    public void setNgoApprovedChat(boolean ngoApprovedChat) { this.ngoApprovedChat = ngoApprovedChat; }
+    public void setMatchedUser(User matchedUser) {
+        this.matchedUser = matchedUser;
+    }
 
-    public double getScore() { return score; }
-    public void setScore(double score) { this.score = score; }
+    public Long getProviderId() {
+        return providerId;
+    }
 
-    public String getRequestMessage() { return requestMessage; }
-    public void setRequestMessage(String requestMessage) { this.requestMessage = requestMessage; }
+    public void setProviderId(Long providerId) {
+        this.providerId = providerId;
+    }
 
-    public String getAttachmentUrl() { return attachmentUrl; }
-    public void setAttachmentUrl(String attachmentUrl) { this.attachmentUrl = attachmentUrl; }
+    public String getProviderType() {
+        return providerType;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setProviderType(String providerType) {
+        this.providerType = providerType;
+    }
+
+    public String getMatchStatus() {
+        return matchStatus;
+    }
+
+    public void setMatchStatus(String matchStatus) {
+        this.matchStatus = matchStatus;
+    }
+
+    public boolean isLawyerApprovedChat() {
+        return lawyerApprovedChat;
+    }
+
+    public void setLawyerApprovedChat(boolean lawyerApprovedChat) {
+        this.lawyerApprovedChat = lawyerApprovedChat;
+    }
+
+    public boolean isNgoApprovedChat() {
+        return ngoApprovedChat;
+    }
+
+    public void setNgoApprovedChat(boolean ngoApprovedChat) {
+        this.ngoApprovedChat = ngoApprovedChat;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    // Alias methods for milestone naming.
+    public double getMatchScore() {
+        return score;
+    }
+
+    public void setMatchScore(double matchScore) {
+        this.score = matchScore;
+    }
+
+    public String getRequestMessage() {
+        return requestMessage;
+    }
+
+    public void setRequestMessage(String requestMessage) {
+        this.requestMessage = requestMessage;
+    }
+
+    public String getAttachmentUrl() {
+        return attachmentUrl;
+    }
+
+    public void setAttachmentUrl(String attachmentUrl) {
+        this.attachmentUrl = attachmentUrl;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (matchStatus == null) matchStatus = "PENDING";
+        if (matchStatus == null) {
+            matchStatus = "PENDING";
+        }
+        if (providerId == null && matchedUser != null) {
+            providerId = matchedUser.getId();
+        }
+        if ((providerType == null || providerType.isBlank()) && matchedUser != null && matchedUser.getRole() != null) {
+            providerType = matchedUser.getRole().name();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        if (providerId == null && matchedUser != null) {
+            providerId = matchedUser.getId();
+        }
+        if ((providerType == null || providerType.isBlank()) && matchedUser != null && matchedUser.getRole() != null) {
+            providerType = matchedUser.getRole().name();
+        }
     }
 }

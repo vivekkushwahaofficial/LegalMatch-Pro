@@ -1,37 +1,38 @@
 import { Link } from "react-router-dom";
-import { MessageCircle, Send, Clock, XCircle } from "lucide-react";
+import { MessageCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
 
-export default function MatchCard({ profile, onRequest, onReject }) {
+export default function MatchCard({ profile, onAccept, onReject }) {
 
   const getStatusConfig = (status) => {
     switch (status) {
       case "PENDING":
-        return { 
-          label: "Send Request", 
-          icon: <Send className="w-4 h-4" />, 
+        return {
+          label: "Accept Match",
+          icon: <CheckCircle2 className="w-4 h-4" />,
           color: "bg-blue-600 hover:bg-blue-700",
-          action: () => onRequest(profile)
+          action: () => onAccept(profile)
         };
       case "REQUESTED":
-        return { 
-          label: "Requested", 
-          icon: <Clock className="w-4 h-4" />, 
+        return {
+          label: "Requested",
+          icon: <Clock className="w-4 h-4" />,
           color: "bg-gray-400 cursor-not-allowed",
-          disabled: true 
+          disabled: true
         };
       case "APPROVED":
-        return { 
-          label: "Message", 
-          icon: <MessageCircle className="w-4 h-4" />, 
+      case "ACCEPTED":
+        return {
+          label: "Message",
+          icon: <MessageCircle className="w-4 h-4" />,
           color: "bg-green-600 hover:bg-green-700",
-          link: "/citizen/chat" 
+          link: "/citizen/chat"
         };
       case "REJECTED":
-        return { 
-          label: "Rejected", 
-          icon: <XCircle className="w-4 h-4" />, 
+        return {
+          label: "Rejected",
+          icon: <XCircle className="w-4 h-4" />,
           color: "bg-red-500 cursor-not-allowed",
-          disabled: true 
+          disabled: true
         };
       default:
         return { label: "Unknown", color: "bg-gray-200" };
@@ -51,7 +52,7 @@ export default function MatchCard({ profile, onRequest, onReject }) {
             alt="profile"
             className="w-14 h-14 rounded-full border-2 border-blue-100 p-0.5"
           />
-          {profile.status === "APPROVED" && (
+          {(profile.status === "APPROVED" || profile.status === "ACCEPTED") && (
             <div className="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white w-4 h-4 rounded-full"></div>
           )}
         </div>
@@ -104,12 +105,12 @@ export default function MatchCard({ profile, onRequest, onReject }) {
         )}
 
         {profile.status === "PENDING" && (
-            <button
-              onClick={() => onReject(profile)}
-              className="w-full bg-white text-gray-500 py-2.5 rounded-xl font-bold text-sm border border-gray-100 hover:bg-gray-50 transition-all hover:text-red-500"
-            >
-              Pass for now
-            </button>
+          <button
+            onClick={() => onReject(profile)}
+            className="w-full bg-white text-gray-500 py-2.5 rounded-xl font-bold text-sm border border-gray-100 hover:bg-gray-50 transition-all hover:text-red-500"
+          >
+            Pass for now
+          </button>
         )}
 
         <Link to={`/lawyer-profile/${profile.id}`} className="block w-full text-center">

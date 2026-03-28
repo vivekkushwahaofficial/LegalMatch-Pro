@@ -23,7 +23,7 @@ const schema = yup.object({
 
   role: yup
     .string()
-    .oneOf(["Citizen", "Lawyer", "NGO", "Admin"])
+    .oneOf(["Citizen", "Lawyer", "NGO"])
     .required("Role is required"),
 
   specialization: yup.string().when("role", {
@@ -148,7 +148,6 @@ function Signup() {
               <option value="Citizen">Citizen</option>
               <option value="Lawyer">Lawyer</option>
               <option value="NGO">NGO</option>
-              <option value="Admin">Admin</option>
             </select>
           </div>
 

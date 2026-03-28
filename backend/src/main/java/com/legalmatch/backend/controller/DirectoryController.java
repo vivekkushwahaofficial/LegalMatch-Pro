@@ -1,5 +1,14 @@
 package com.legalmatch.backend.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.legalmatch.backend.dto.LawyerDirectoryResponse;
 import com.legalmatch.backend.dto.NgoDirectoryResponse;
 import com.legalmatch.backend.entity.LawyerDirectory;
@@ -7,11 +16,6 @@ import com.legalmatch.backend.entity.LawyerProfile;
 import com.legalmatch.backend.entity.NgoDirectory;
 import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.service.DirectoryService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/directory")
@@ -26,17 +30,22 @@ public class DirectoryController {
     @GetMapping("/lawyers")
     public List<LawyerDirectoryResponse> getLawyers(
             @RequestParam(required = false) String specialization,
-            @RequestParam(required = false) String location
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Boolean verified
     ) {
         List<LawyerDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<LawyerProfile> profiles = directoryService.searchLawyers(specialization, location);
-        mergedList.addAll(profiles.stream().map(this::mapLawyerProfile).collect(Collectors.toList()));
+        List<LawyerProfile> profiles = directoryService.searchLawyers(specialization, location, verified);
+        mergedList.addAll(profiles.stream()
+                .filter(p -> p.getUser() != null)
+                .map(this::mapLawyerProfile)
+                .collect(Collectors.toList()));
 
         List<LawyerDirectory> directoryLawyers = directoryService.getAllDirectoryLawyers();
         mergedList.addAll(directoryLawyers.stream()
                 .filter(l -> (specialization == null || l.getExpertise().equalsIgnoreCase(specialization))
-                          && (location == null || l.getLocation().equalsIgnoreCase(location)))
+                && (location == null || l.getLocation().equalsIgnoreCase(location))
+                && (verified == null || (l.getVerified() != null && l.getVerified().equals(verified))))
                 .map(this::mapLawyerDirectory)
                 .collect(Collectors.toList()));
 
@@ -45,16 +54,21 @@ public class DirectoryController {
 
     @GetMapping("/ngos")
     public List<NgoDirectoryResponse> getNgos(
-            @RequestParam(required = false) String location
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Boolean verified
     ) {
         List<NgoDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<NgoProfile> profiles = directoryService.getNgos(location);
-        mergedList.addAll(profiles.stream().map(this::mapNgoProfile).collect(Collectors.toList()));
+        List<NgoProfile> profiles = directoryService.getNgos(location, verified);
+        mergedList.addAll(profiles.stream()
+                .filter(p -> p.getUser() != null)
+                .map(this::mapNgoProfile)
+                .collect(Collectors.toList()));
 
         List<NgoDirectory> directoryNgos = directoryService.getAllDirectoryNgos();
         mergedList.addAll(directoryNgos.stream()
-                .filter(n -> (location == null || n.getLocation().equalsIgnoreCase(location)))
+                .filter(n -> (location == null || n.getLocation().equalsIgnoreCase(location))
+                && (verified == null || (n.getVerified() != null && n.getVerified().equals(verified))))
                 .map(this::mapNgoDirectory)
                 .collect(Collectors.toList()));
 

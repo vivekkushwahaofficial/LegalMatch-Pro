@@ -22,7 +22,7 @@ public class CaseController {
     @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping
     public CaseResponse createCase(@RequestBody Case caseRequest,
-                                   Authentication authentication) {
+            Authentication authentication) {
 
         return caseService.createCase(caseRequest, authentication.getName());
     }
@@ -44,7 +44,7 @@ public class CaseController {
     @PreAuthorize("hasAnyRole('ADMIN','LAWYER')")
     @PutMapping("/{id}/status")
     public CaseResponse updateCaseStatus(@PathVariable Long id,
-                                         @RequestParam String status) {
+            @RequestParam String status) {
 
         return caseService.updateCaseStatus(id, status);
     }
@@ -56,9 +56,11 @@ public class CaseController {
         return caseService.searchByStatus(status);
     }
 
+    @PreAuthorize("hasAnyRole('CITIZEN','LAWYER','NGO','ADMIN')")
     @GetMapping("/{id}")
-    public CaseResponse getCaseById(@PathVariable Long id) {
+    public CaseResponse getCaseById(@PathVariable Long id,
+            Authentication authentication) {
 
-        return caseService.getCaseById(id);
+        return caseService.getCaseById(id, authentication.getName());
     }
 }

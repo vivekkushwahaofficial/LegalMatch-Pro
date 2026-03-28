@@ -1,15 +1,52 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiCall } from "../../api/apiConfig";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const [user, setUser] = useState({
-    name: "Dharshini",
-    email: "dharshini@gmail.com",
-    role: "Citizen",
-    location: "Chennai",
-    specialization: "Family Law"
+    name: "",
+    email: "",
+    role: "",
+    location: "",
+    specialization: "",
+    ngoName: "",
+    registrationNumber: "",
+    licenseNumber: "",
   });
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const profile = await apiCall("/profile/me", "GET");
+        setUser({
+          name: profile?.name || "",
+          email: profile?.email || "",
+          role: profile?.role || "",
+          location: profile?.location || "",
+          specialization: profile?.specialization || "",
+          ngoName: profile?.ngoName || "",
+          registrationNumber: profile?.registrationNumber || "",
+          licenseNumber: profile?.licenseNumber || "",
+        });
+      } catch (err) {
+        setError(err?.message || "Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const roleUpper = useMemo(() => String(user.role || "").toUpperCase(), [user.role]);
+  const isLawyer = roleUpper === "LAWYER";
+  const isNgo = roleUpper === "NGO";
 
   const handleChange = (e) => {
     setUser({
@@ -18,15 +55,56 @@ export default function Profile() {
     });
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    alert("Profile updated (frontend only)");
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError("");
+
+      const payload = {
+        name: user.name,
+        location: user.location,
+        specialization: user.specialization,
+        ngoName: user.ngoName,
+        registrationNumber: user.registrationNumber,
+        licenseNumber: user.licenseNumber,
+      };
+
+      const updated = await apiCall("/profile/update", "PUT", payload);
+      setUser((prev) => ({
+        ...prev,
+        name: updated?.name || prev.name,
+        email: updated?.email || prev.email,
+        role: updated?.role || prev.role,
+        location: updated?.location || prev.location,
+        specialization: updated?.specialization || prev.specialization,
+        ngoName: updated?.ngoName || prev.ngoName,
+        registrationNumber: updated?.registrationNumber || prev.registrationNumber,
+        licenseNumber: updated?.licenseNumber || prev.licenseNumber,
+      }));
+
+      setIsEditing(false);
+      alert("Profile updated successfully");
+    } catch (err) {
+      setError(err?.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">Loading profile...</div>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
 
       <h1 className="text-2xl font-semibold mb-6">Profile Management</h1>
+
+      {error && (
+        <div className="mb-4 p-3 rounded bg-red-50 text-red-600 text-sm border border-red-200">
+          {error}
+        </div>
+      )}
 
       {/* Profile Image */}
       <div className="flex items-center gap-4 mb-6">
@@ -88,18 +166,61 @@ export default function Profile() {
         />
       </div>
 
-      {/* Specialization (for Lawyer/NGO) */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Specialization</label>
-        <input
-          type="text"
-          name="specialization"
-          value={user.specialization}
-          onChange={handleChange}
-          disabled={!isEditing}
-          className="w-full border p-2 rounded mt-1"
-        />
-      </div>
+      {(isLawyer || isNgo) && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Specialization</label>
+          <input
+            type="text"
+            name="specialization"
+            value={user.specialization}
+            onChange={handleChange}
+            disabled={!isEditing}
+            className="w-full border p-2 rounded mt-1"
+          />
+        </div>
+      )}
+
+      {isLawyer && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium">License Number</label>
+          <input
+            type="text"
+            name="licenseNumber"
+            value={user.licenseNumber}
+            onChange={handleChange}
+            disabled={!isEditing}
+            className="w-full border p-2 rounded mt-1"
+          />
+        </div>
+      )}
+
+      {isNgo && (
+        <>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">NGO Name</label>
+            <input
+              type="text"
+              name="ngoName"
+              value={user.ngoName}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className="w-full border p-2 rounded mt-1"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Registration Number</label>
+            <input
+              type="text"
+              name="registrationNumber"
+              value={user.registrationNumber}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className="w-full border p-2 rounded mt-1"
+            />
+          </div>
+        </>
+      )}
 
       {/* Buttons */}
       <div className="flex gap-3 mt-6">
@@ -107,9 +228,10 @@ export default function Profile() {
           <>
             <button
               onClick={handleSave}
+              disabled={saving}
               className="bg-green-500 text-white px-4 py-2 rounded"
             >
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
 
             <button

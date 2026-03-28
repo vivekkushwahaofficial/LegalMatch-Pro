@@ -1,16 +1,22 @@
 package com.legalmatch.backend.service;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
 import com.legalmatch.backend.dto.CaseResponse;
 import com.legalmatch.backend.entity.Case;
+import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.repository.CaseRepository;
 import com.legalmatch.backend.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CaseService {
+
+    private static final Set<String> ALLOWED_CASE_STATUSES = Set.of("SUBMITTED", "IN_REVIEW", "MATCHED");
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
@@ -93,7 +99,7 @@ public class CaseService {
         Case existingCase = caseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Case not found"));
 
-        existingCase.setStatus(status);
+        existingCase.setStatus(normalizeCaseStatus(status));
 
         Case updatedCase = caseRepository.save(existingCase);
 
@@ -103,16 +109,41 @@ public class CaseService {
     // search cases
     public List<CaseResponse> searchByStatus(String status) {
 
-        return caseRepository.findByStatus(status)
+        return caseRepository.findByStatus(normalizeCaseStatus(status))
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    public CaseResponse getCaseById(Long id) {
+    private String normalizeCaseStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("Case status is required");
+        }
+
+        String normalized = status.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
+        if ("INREVIEW".equals(normalized)) {
+            normalized = "IN_REVIEW";
+        }
+
+        if (!ALLOWED_CASE_STATUSES.contains(normalized)) {
+            throw new RuntimeException("Invalid case status: " + status);
+        }
+
+        return normalized;
+    }
+
+    public CaseResponse getCaseById(Long id, String requesterEmail) {
 
         Case c = caseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Case not found"));
+
+        User requester = userRepository.findByEmail(requesterEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Citizens can only read their own cases. Legal professionals and admins may read case details.
+        if (requester.getRole() == Role.CITIZEN && !c.getUser().getId().equals(requester.getId())) {
+            throw new RuntimeException("Not authorized to view this case");
+        }
 
         return mapToResponse(c);
     }

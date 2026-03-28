@@ -1,37 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiCall } from "../../api/apiConfig";
 
 export default function NGODashboard() {
 
-  const [cases, setCases] = useState([
-    {
-      id: 1,
-      title: "Domestic Violence Case",
-      description: "Need legal and social support",
-      status: "Pending"
-    },
-    {
-      id: 2,
-      title: "Child Labor Issue",
-      description: "Urgent NGO intervention required",
-      status: "Pending"
-    }
-  ]);
+  const [cases, setCases] = useState([]);
 
-  const handleAccept = (id) => {
-    setCases(prev =>
-      prev.map(c =>
-        c.id === id ? { ...c, status: "Accepted" } : c
-      )
-    );
+  const loadCases = async () => {
+    try {
+      const data = await apiCall("/matches/my", "GET");
+      const list = Array.isArray(data) ? data : [];
+      setCases(list.filter((m) => String(m.matchStatus || "").toUpperCase() === "REQUESTED"));
+    } catch (error) {
+      console.error("Failed to load NGO assignments", error);
+      setCases([]);
+    }
   };
 
-  const handleReject = (id) => {
-    setCases(prev =>
-      prev.map(c =>
-        c.id === id ? { ...c, status: "Rejected" } : c
-      )
-    );
+  useEffect(() => {
+    loadCases();
+  }, []);
+
+  const handleAccept = async (id) => {
+    try {
+      await apiCall(`/matches/${id}/accept`, "PUT");
+      await loadCases();
+    } catch (error) {
+      alert("Unable to accept case");
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await apiCall(`/matches/${id}/reject`, "PUT");
+      await loadCases();
+    } catch (error) {
+      alert("Unable to reject case");
+    }
   };
 
   return (
@@ -41,8 +46,8 @@ export default function NGODashboard() {
       </h1>
 
       <Link to="/ngo/requests" className="block mb-8 bg-blue-600 p-6 rounded-xl shadow-md border border-blue-700 text-white hover:bg-blue-700 transition-all">
-          <h3 className="font-bold text-lg">Communication Requests</h3>
-          <p className="text-sm opacity-90 mt-2">Manage incoming chat requests from individuals seeking legal aid.</p>
+        <h3 className="font-bold text-lg">Communication Requests</h3>
+        <p className="text-sm opacity-90 mt-2">Manage incoming chat requests from individuals seeking legal aid.</p>
       </Link>
 
       {cases.length === 0 ? (
@@ -52,29 +57,29 @@ export default function NGODashboard() {
 
           {cases.map((c) => (
             <div
-              key={c.id}
+              key={c.matchId}
               className="bg-white p-5 rounded-xl shadow"
             >
-              <h3 className="font-semibold">{c.title}</h3>
+              <h3 className="font-semibold">{c.caseTitle}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                {c.description}
+                Support request awaiting your decision.
               </p>
 
               <p className="mb-3">
-                Status: <b>{c.status}</b>
+                Status: <b>{c.matchStatus}</b>
               </p>
 
               <div className="flex gap-2">
                 <div className="flex gap-2 mb-2">
                   <button
-                    onClick={() => handleAccept(c.id)}
+                    onClick={() => handleAccept(c.matchId)}
                     className="flex-1 bg-green-500 text-white py-1 rounded"
                   >
                     Accept
                   </button>
 
                   <button
-                    onClick={() => handleReject(c.id)}
+                    onClick={() => handleReject(c.matchId)}
                     className="flex-1 bg-red-500 text-white py-1 rounded"
                   >
                     Reject
@@ -82,7 +87,7 @@ export default function NGODashboard() {
                 </div>
 
                 <button
-                  onClick={() => alert(c.description)}
+                  onClick={() => alert(c.caseTitle)}
                   className="w-full bg-blue-500 text-white py-1 rounded"
                 >
                   View Details

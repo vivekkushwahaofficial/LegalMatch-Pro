@@ -48,9 +48,11 @@ function Signin() {
 
       // Save token using AuthContext
       login(result.accessToken);
-      
+
       localStorage.setItem("refreshToken", result.refreshToken);
       localStorage.setItem("userName", result.name);
+      if (result.role) localStorage.setItem("role", result.role);
+      if (result.userId) localStorage.setItem("userId", String(result.userId));
 
       alert("Login successful!");
 

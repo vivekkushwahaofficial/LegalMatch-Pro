@@ -29,10 +29,10 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public AuthService(UserRepository userRepository,
-                       LawyerProfileRepository lawyerProfileRepository,
-                       NgoProfileRepository ngoProfileRepository,
-                       JwtService jwtService,
-                       BCryptPasswordEncoder passwordEncoder) {
+            LawyerProfileRepository lawyerProfileRepository,
+            NgoProfileRepository ngoProfileRepository,
+            JwtService jwtService,
+            BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.lawyerProfileRepository = lawyerProfileRepository;
         this.ngoProfileRepository = ngoProfileRepository;
@@ -55,7 +55,7 @@ public class AuthService {
         } else if (request.getRole().equalsIgnoreCase("NGO")) {
             role = Role.NGO;
         } else if (request.getRole().equalsIgnoreCase("ADMIN")) {
-            role = Role.ADMIN;
+            throw new RuntimeException("Admin registration is not allowed");
         } else {
             role = Role.CITIZEN;
         }
@@ -123,6 +123,7 @@ public class AuthService {
         tokens.put("refreshToken", refreshToken);
         tokens.put("role", user.getRole().name());
         tokens.put("name", user.getName());
+        tokens.put("userId", String.valueOf(user.getId()));
 
         return tokens;
     }
@@ -149,6 +150,8 @@ public class AuthService {
 
         response.put("accessToken", newAccessToken);
         response.put("name", user.getName());
+        response.put("role", user.getRole().name());
+        response.put("userId", String.valueOf(user.getId()));
 
         return response;
     }
