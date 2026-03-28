@@ -1,6 +1,8 @@
 package com.legalmatch.backend.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -17,18 +19,25 @@ import com.legalmatch.backend.entity.Match;
 import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.entity.VerificationStatus;
 import com.legalmatch.backend.repository.CaseRepository;
 import com.legalmatch.backend.repository.LawyerProfileRepository;
 import com.legalmatch.backend.repository.MatchRepository;
 import com.legalmatch.backend.repository.NgoProfileRepository;
+import com.legalmatch.backend.repository.UserRepository;
 
 @Service
 public class MatchingService {
+
+    private static final double PRIMARY_MATCH_SCORE_THRESHOLD = 40.0;
+    private static final double FALLBACK_MATCH_SCORE_THRESHOLD = 25.0;
+    private static final int MAX_MATCHES_PER_CASE = 2;
 
     private final MatchRepository matchRepository;
     private final CaseRepository caseRepository;
     private final LawyerProfileRepository lawyerProfileRepository;
     private final NgoProfileRepository ngoProfileRepository;
+    private final UserRepository userRepository;
     private final ProfileService profileService;
     private final ImpactService impactService;
     private final NotificationService notificationService;
@@ -37,6 +46,7 @@ public class MatchingService {
             CaseRepository caseRepository,
             LawyerProfileRepository lawyerProfileRepository,
             NgoProfileRepository ngoProfileRepository,
+            UserRepository userRepository,
             ProfileService profileService,
             ImpactService impactService,
             NotificationService notificationService) {
@@ -44,6 +54,7 @@ public class MatchingService {
         this.caseRepository = caseRepository;
         this.lawyerProfileRepository = lawyerProfileRepository;
         this.ngoProfileRepository = ngoProfileRepository;
+        this.userRepository = userRepository;
         this.profileService = profileService;
         this.impactService = impactService;
         this.notificationService = notificationService;
@@ -58,7 +69,7 @@ public class MatchingService {
         List<LawyerProfile> lawyers = lawyerProfileRepository.findAll();
         List<NgoProfile> ngos = ngoProfileRepository.findAll();
 
-        List<Match> matches = new ArrayList<>();
+        List<ProviderCandidate> scoredCandidates = new ArrayList<>();
         Set<Long> existingProviderIds = matchRepository.findByLegalCase_Id(safeCaseId)
                 .stream()
                 .map(m -> m.getMatchedUser().getId())
@@ -80,17 +91,7 @@ public class MatchingService {
                     lawyer.isVerified(),
                     calculateAvailability(lawyer.getUser())
             );
-
-            if (score > 40) {
-                Match match = new Match();
-                match.setLegalCase(legalCase);
-                match.setMatchedUser(lawyer.getUser());
-                match.setProviderId(lawyer.getUser().getId());
-                match.setProviderType(Role.LAWYER.name());
-                match.setScore(score);
-                match.setMatchStatus("PENDING");
-                matches.add(match);
-            }
+            scoredCandidates.add(new ProviderCandidate(lawyer.getUser(), Role.LAWYER, score));
         }
 
         for (NgoProfile ngo : ngos) {
@@ -109,17 +110,72 @@ public class MatchingService {
                     ngo.isVerified(),
                     calculateAvailability(ngo.getUser())
             );
+            scoredCandidates.add(new ProviderCandidate(ngo.getUser(), Role.NGO, score));
+        }
 
-            if (score > 40) {
-                Match match = new Match();
-                match.setLegalCase(legalCase);
-                match.setMatchedUser(ngo.getUser());
-                match.setProviderId(ngo.getUser().getId());
-                match.setProviderType(Role.NGO.name());
-                match.setScore(score);
-                match.setMatchStatus("PENDING");
-                matches.add(match);
+        // Include approved providers even if profile rows are missing/incomplete.
+        Set<Long> candidateUserIds = new HashSet<>(scoredCandidates.stream()
+                .map(candidate -> candidate.user().getId())
+                .toList());
+
+        for (User provider : userRepository.findByStatus(VerificationStatus.APPROVED)) {
+            if (provider.getId() == null
+                    || existingProviderIds.contains(provider.getId())
+                    || candidateUserIds.contains(provider.getId())
+                    || (provider.getRole() != Role.LAWYER && provider.getRole() != Role.NGO)) {
+                continue;
             }
+
+            String specialization = null;
+            String location = null;
+            boolean verified = false;
+
+            if (provider.getRole() == Role.LAWYER && provider.getLawyerProfile() != null) {
+                specialization = provider.getLawyerProfile().getSpecialization();
+                location = provider.getLawyerProfile().getLocation();
+                verified = provider.getLawyerProfile().isVerified();
+            } else if (provider.getRole() == Role.NGO && provider.getNgoProfile() != null) {
+                specialization = provider.getNgoProfile().getSpecialization();
+                location = provider.getNgoProfile().getLocation();
+                verified = provider.getNgoProfile().isVerified();
+            }
+
+            double score = calculateScore(
+                    legalCase,
+                    specialization,
+                    location,
+                    verified,
+                    calculateAvailability(provider)
+            );
+
+            scoredCandidates.add(new ProviderCandidate(provider, provider.getRole(), score));
+            candidateUserIds.add(provider.getId());
+        }
+
+        List<Match> matches = scoredCandidates.stream()
+                .filter(candidate -> candidate.score() >= PRIMARY_MATCH_SCORE_THRESHOLD)
+                .sorted(Comparator.comparingDouble(ProviderCandidate::score).reversed())
+                .limit(MAX_MATCHES_PER_CASE)
+                .map(candidate -> buildPendingMatch(legalCase, candidate))
+                .toList();
+
+        // Fallback: avoid empty match screens by suggesting top relevant providers.
+        if (matches.isEmpty()) {
+            matches = scoredCandidates.stream()
+                    .filter(candidate -> candidate.score() >= FALLBACK_MATCH_SCORE_THRESHOLD)
+                    .sorted(Comparator.comparingDouble(ProviderCandidate::score).reversed())
+                    .limit(MAX_MATCHES_PER_CASE)
+                    .map(candidate -> buildPendingMatch(legalCase, candidate))
+                    .toList();
+        }
+
+        // Last-resort fallback: still suggest top candidates even if threshold fit is weak.
+        if (matches.isEmpty()) {
+            matches = scoredCandidates.stream()
+                    .sorted(Comparator.comparingDouble(ProviderCandidate::score).reversed())
+                    .limit(MAX_MATCHES_PER_CASE)
+                    .map(candidate -> buildPendingMatch(legalCase, candidate))
+                    .toList();
         }
 
         List<Match> saved = matchRepository.saveAll(matches);
@@ -131,6 +187,21 @@ public class MatchingService {
                     "MATCH_CREATED"
             );
         }
+    }
+
+    private Match buildPendingMatch(Case legalCase, ProviderCandidate candidate) {
+        Match match = new Match();
+        match.setLegalCase(legalCase);
+        match.setMatchedUser(candidate.user());
+        match.setProviderId(candidate.user().getId());
+        match.setProviderType(candidate.providerRole().name());
+        match.setScore(candidate.score());
+        match.setMatchStatus("PENDING");
+        return match;
+    }
+
+    private record ProviderCandidate(User user, Role providerRole, double score) {
+
     }
 
     private double calculateScore(Case legalCase,
@@ -188,6 +259,22 @@ public class MatchingService {
             matches = new ArrayList<>();
             for (Case c : userCases) {
                 matches.addAll(matchRepository.findByLegalCase_Id(c.getId()));
+            }
+
+            // Backfill once when a citizen has no matches at all.
+            if (matches.isEmpty() && !userCases.isEmpty()) {
+                Case mostRecentCase = userCases.stream()
+                        .max(Comparator.comparing(Case::getCreatedAt,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                                .thenComparing(Case::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .orElse(null);
+
+                if (mostRecentCase != null) {
+                    generateMatchesForCase(mostRecentCase.getId());
+                    for (Case c : userCases) {
+                        matches.addAll(matchRepository.findByLegalCase_Id(c.getId()));
+                    }
+                }
             }
         } else {
             matches = matchRepository.findByMatchedUser(currentUser);

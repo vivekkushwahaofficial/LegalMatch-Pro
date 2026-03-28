@@ -45,8 +45,7 @@ public class SecurityConfig {
                 // Public APIs (Relaxed for testing as requested)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
-                .requestMatchers("/api/directory/**").permitAll() // 👈 Temporarily public
-
+                .requestMatchers("/api/directory/**").authenticated()
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Authenticated users

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.entity.VerificationStatus;
 
@@ -14,6 +15,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-List<User> findByStatus(VerificationStatus status);
+    List<User> findByStatus(VerificationStatus status);
+
+    long countByRole(Role role);
+
+    List<User> findByRole(Role role);
 
 }

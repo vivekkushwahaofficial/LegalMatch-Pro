@@ -1,14 +1,23 @@
 package com.legalmatch.backend.service;
 
-import com.legalmatch.backend.entity.*;
-import com.legalmatch.backend.repository.*;
+import java.time.LocalDateTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
+import com.legalmatch.backend.entity.LawyerDirectory;
+import com.legalmatch.backend.entity.LawyerProfile;
+import com.legalmatch.backend.entity.NgoDirectory;
+import com.legalmatch.backend.entity.NgoProfile;
+import com.legalmatch.backend.entity.Role;
+import com.legalmatch.backend.entity.User;
+import com.legalmatch.backend.entity.VerificationStatus;
+import com.legalmatch.backend.repository.LawyerDirectoryRepository;
+import com.legalmatch.backend.repository.NgoDirectoryRepository;
+import com.legalmatch.backend.repository.UserRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -21,9 +30,9 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(LawyerDirectoryRepository lawyerDirRepo,
-                           NgoDirectoryRepository ngoDirRepo,
-                           UserRepository userRepo,
-                           PasswordEncoder passwordEncoder) {
+            NgoDirectoryRepository ngoDirRepo,
+            UserRepository userRepo,
+            PasswordEncoder passwordEncoder) {
         this.lawyerDirRepo = lawyerDirRepo;
         this.ngoDirRepo = ngoDirRepo;
         this.userRepo = userRepo;
@@ -34,7 +43,8 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         log.info("DataInitializer started.");
 
-        if (lawyerDirRepo.count() == 0 || userRepo.count() < 5) {
+        boolean missingProviders = userRepo.countByRole(Role.LAWYER) == 0 || userRepo.countByRole(Role.NGO) == 0;
+        if (lawyerDirRepo.count() == 0 || userRepo.count() < 5 || missingProviders) {
             log.info("Directories/Users are empty. Seeding full sample data...");
             seedUsersAndDirectories();
         }
@@ -51,8 +61,7 @@ public class DataInitializer implements CommandLineRunner {
             {"Adv. Vikram Singh", "vikram@example.com", "Pune", "Civil Law"},
             {"Adv. Neha Deshmukh", "neha@example.com", "Nanded", "Family Law"},
             {"Adv. Arjun Kapoor", "arjun@example.com", "Hyderabad", "Criminal Law"},
-            {"Adv. Kavita Roy", "kavita@example.com", "Kolkata", "Consumer Protection"},
-        };
+            {"Adv. Kavita Roy", "kavita@example.com", "Kolkata", "Consumer Protection"},};
 
         for (String[] row : lawyerData) {
             // Seed Directory
@@ -91,8 +100,7 @@ public class DataInitializer implements CommandLineRunner {
             {"Women's Rights Initiative", "womensrights@example.com", "Bangalore", "Women's Rights"},
             {"Human Rights Watch", "hrw@example.com", "Chennai", "Human Rights"},
             {"Rural Legal Aid", "rural@example.com", "Nanded", "Property Law"},
-            {"Anti-Corruption NGO", "antic@example.com", "Hyderabad", "Anti-Corruption"},
-        };
+            {"Anti-Corruption NGO", "antic@example.com", "Hyderabad", "Anti-Corruption"},};
 
         for (String[] row : ngoData) {
             // Seed Directory

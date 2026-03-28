@@ -20,6 +20,7 @@ import com.legalmatch.backend.repository.CaseRepository;
 import com.legalmatch.backend.repository.LawyerProfileRepository;
 import com.legalmatch.backend.repository.MatchRepository;
 import com.legalmatch.backend.repository.NgoProfileRepository;
+import com.legalmatch.backend.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MatchingServiceAuthorizationTest {
@@ -32,6 +33,8 @@ class MatchingServiceAuthorizationTest {
     private LawyerProfileRepository lawyerProfileRepository;
     @Mock
     private NgoProfileRepository ngoProfileRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private ProfileService profileService;
     @Mock
@@ -48,6 +51,7 @@ class MatchingServiceAuthorizationTest {
                 caseRepository,
                 lawyerProfileRepository,
                 ngoProfileRepository,
+                userRepository,
                 profileService,
                 impactService,
                 notificationService

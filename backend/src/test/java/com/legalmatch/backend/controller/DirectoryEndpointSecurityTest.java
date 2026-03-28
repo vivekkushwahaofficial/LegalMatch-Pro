@@ -25,40 +25,40 @@ class DirectoryEndpointSecurityTest {
     private DirectoryService directoryService;
 
     @Test
-    void publicDirectoryEndpoint_allowsRequestWithoutAuthHeader() throws Exception {
+    void directoryEndpoint_rejectsRequestWithoutAuthHeader() throws Exception {
         when(directoryService.searchLawyers(null, null)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryLawyers()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/lawyers"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void publicDirectoryEndpoint_allowsRequestWithMalformedBearerHeader() throws Exception {
+    void directoryEndpoint_rejectsRequestWithMalformedBearerHeader() throws Exception {
         when(directoryService.searchLawyers(null, null)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryLawyers()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/lawyers")
                 .header("Authorization", "Bearer malformed.token.value"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void publicNgoDirectoryEndpoint_allowsRequestWithoutAuthHeader() throws Exception {
+    void ngoDirectoryEndpoint_rejectsRequestWithoutAuthHeader() throws Exception {
         when(directoryService.getNgos(null)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryNgos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/ngos"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void publicNgoDirectoryEndpoint_allowsRequestWithMalformedBearerHeader() throws Exception {
+    void ngoDirectoryEndpoint_rejectsRequestWithMalformedBearerHeader() throws Exception {
         when(directoryService.getNgos(null)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryNgos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/ngos")
                 .header("Authorization", "Bearer malformed.token.value"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 }

@@ -31,12 +31,14 @@ class CaseServiceAuthorizationTest {
     private UserRepository userRepository;
     @Mock
     private MatchingService matchingService;
+    @Mock
+    private NotificationService notificationService;
 
     private CaseService caseService;
 
     @BeforeEach
     void setUp() {
-        caseService = new CaseService(caseRepository, userRepository, matchingService);
+        caseService = new CaseService(caseRepository, userRepository, matchingService, notificationService);
     }
 
     @Test

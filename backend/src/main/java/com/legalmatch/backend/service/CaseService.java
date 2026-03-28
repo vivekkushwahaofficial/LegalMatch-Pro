@@ -21,11 +21,16 @@ public class CaseService {
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
     private final MatchingService matchingService;
+    private final NotificationService notificationService;
 
-    public CaseService(CaseRepository caseRepository, UserRepository userRepository, MatchingService matchingService) {
+    public CaseService(CaseRepository caseRepository,
+            UserRepository userRepository,
+            MatchingService matchingService,
+            NotificationService notificationService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
         this.matchingService = matchingService;
+        this.notificationService = notificationService;
     }
 
     // convert entity → DTO
@@ -65,6 +70,20 @@ public class CaseService {
         caseRequest.setStatus("SUBMITTED");
 
         Case savedCase = caseRepository.save(caseRequest);
+
+        notificationService.createNotification(
+                user.getId(),
+                "Case registered successfully: " + savedCase.getTitle(),
+                "CASE_REGISTERED"
+        );
+
+        for (User admin : userRepository.findByRole(Role.ADMIN)) {
+            notificationService.createNotification(
+                    admin.getId(),
+                    "New case submitted by " + user.getName() + ": " + savedCase.getTitle(),
+                    "CASE_SUBMITTED"
+            );
+        }
 
         // Auto-generate matches based on the new case
         matchingService.generateMatchesForCase(savedCase.getId());

@@ -1,6 +1,10 @@
 import openpyxl
 import os
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+resources_dir = os.path.join(base_dir, "backend", "src", "main", "resources")
+os.makedirs(resources_dir, exist_ok=True)
+
 # --- NGO Data ---
 ngo_wb = openpyxl.Workbook()
 ngo_ws = ngo_wb.active
@@ -28,7 +32,7 @@ ngo_data = [
 for row in ngo_data:
     ngo_ws.append(row)
 
-output = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "backend", "src", "main", "resources", "ngo_data.xlsx")
+output = os.path.join(resources_dir, "ngo_data.xlsx")
 ngo_wb.save(output)
 print(f"Created: {output}")
 
@@ -59,6 +63,6 @@ lawyer_data = [
 for row in lawyer_data:
     lawyer_ws.append(row)
 
-output2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "backend", "src", "main", "resources", "lawyer_data.xlsx")
+output2 = os.path.join(resources_dir, "lawyer_data.xlsx")
 lawyer_wb.save(output2)
 print(f"Created: {output2}")

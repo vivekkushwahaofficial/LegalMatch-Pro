@@ -2,6 +2,7 @@ package com.legalmatch.backend.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,9 @@ import com.legalmatch.backend.service.DirectoryService;
 @RequestMapping("/api/directory")
 public class DirectoryController {
 
+    private static final int MAX_FILTER_LENGTH = 80;
+    private static final Pattern SAFE_FILTER_PATTERN = Pattern.compile("^[A-Za-z0-9 .,'&\\-/]+$");
+
     private final DirectoryService directoryService;
 
     public DirectoryController(DirectoryService directoryService) {
@@ -33,9 +37,12 @@ public class DirectoryController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Boolean verified
     ) {
+        final String normalizedSpecialization = sanitizeFilter(specialization, "specialization");
+        final String normalizedLocation = sanitizeFilter(location, "location");
+
         List<LawyerDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<LawyerProfile> profiles = directoryService.searchLawyers(specialization, location, verified);
+        List<LawyerProfile> profiles = directoryService.searchLawyers(normalizedSpecialization, normalizedLocation, verified);
         mergedList.addAll(profiles.stream()
                 .filter(p -> p.getUser() != null)
                 .map(this::mapLawyerProfile)
@@ -43,8 +50,8 @@ public class DirectoryController {
 
         List<LawyerDirectory> directoryLawyers = directoryService.getAllDirectoryLawyers();
         mergedList.addAll(directoryLawyers.stream()
-                .filter(l -> (specialization == null || l.getExpertise().equalsIgnoreCase(specialization))
-                && (location == null || l.getLocation().equalsIgnoreCase(location))
+                .filter(l -> (normalizedSpecialization == null || l.getExpertise().equalsIgnoreCase(normalizedSpecialization))
+                && (normalizedLocation == null || l.getLocation().equalsIgnoreCase(normalizedLocation))
                 && (verified == null || (l.getVerified() != null && l.getVerified().equals(verified))))
                 .map(this::mapLawyerDirectory)
                 .collect(Collectors.toList()));
@@ -57,9 +64,11 @@ public class DirectoryController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Boolean verified
     ) {
+        final String normalizedLocation = sanitizeFilter(location, "location");
+
         List<NgoDirectoryResponse> mergedList = new ArrayList<>();
 
-        List<NgoProfile> profiles = directoryService.getNgos(location, verified);
+        List<NgoProfile> profiles = directoryService.getNgos(normalizedLocation, verified);
         mergedList.addAll(profiles.stream()
                 .filter(p -> p.getUser() != null)
                 .map(this::mapNgoProfile)
@@ -67,7 +76,7 @@ public class DirectoryController {
 
         List<NgoDirectory> directoryNgos = directoryService.getAllDirectoryNgos();
         mergedList.addAll(directoryNgos.stream()
-                .filter(n -> (location == null || n.getLocation().equalsIgnoreCase(location))
+                .filter(n -> (normalizedLocation == null || n.getLocation().equalsIgnoreCase(normalizedLocation))
                 && (verified == null || (n.getVerified() != null && n.getVerified().equals(verified))))
                 .map(this::mapNgoDirectory)
                 .collect(Collectors.toList()));
@@ -111,5 +120,26 @@ public class DirectoryController {
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
         dto.setOrganizationDetails(dir.getOrganizationDetails());
         return dto;
+    }
+
+    private String sanitizeFilter(String input, String fieldName) {
+        if (input == null) {
+            return null;
+        }
+
+        String normalized = input.trim();
+        if (normalized.isEmpty()) {
+            return null;
+        }
+
+        if (normalized.length() > MAX_FILTER_LENGTH) {
+            throw new RuntimeException(fieldName + " is too long");
+        }
+
+        if (!SAFE_FILTER_PATTERN.matcher(normalized).matches()) {
+            throw new RuntimeException("Invalid characters in " + fieldName);
+        }
+
+        return normalized;
     }
 }

@@ -2,6 +2,7 @@ package com.legalmatch.backend.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,6 +32,9 @@ public class Match {
     // Milestone-3 explicit provider fields (kept alongside matchedUser for backward compatibility).
     private Long providerId;
     private String providerType; // LAWYER / NGO
+
+    @Column(name = "status", nullable = false)
+    private String status; // Legacy DB column kept for compatibility.
 
     private String matchStatus; // PENDING, REQUESTED, APPROVED, REJECTED
     private boolean lawyerApprovedChat;
@@ -90,6 +94,16 @@ public class Match {
 
     public void setMatchStatus(String matchStatus) {
         this.matchStatus = matchStatus;
+        this.status = matchStatus;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+        this.matchStatus = status;
     }
 
     public boolean isLawyerApprovedChat() {
@@ -153,8 +167,13 @@ public class Match {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (matchStatus == null) {
+        if (matchStatus == null && status == null) {
             matchStatus = "PENDING";
+            status = "PENDING";
+        } else if (matchStatus == null) {
+            matchStatus = status;
+        } else if (status == null) {
+            status = matchStatus;
         }
         if (providerId == null && matchedUser != null) {
             providerId = matchedUser.getId();
@@ -167,6 +186,12 @@ public class Match {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        if (matchStatus == null && status != null) {
+            matchStatus = status;
+        }
+        if (status == null && matchStatus != null) {
+            status = matchStatus;
+        }
         if (providerId == null && matchedUser != null) {
             providerId = matchedUser.getId();
         }

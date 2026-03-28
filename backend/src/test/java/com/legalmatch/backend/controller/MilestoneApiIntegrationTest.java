@@ -36,13 +36,16 @@ class MilestoneApiIntegrationTest {
 
     @Test
     void getLawyers_verifiedTrue_passesFiltersToService() throws Exception {
+        String token = jwtService.generateAccessToken("citizen@test.com", "CITIZEN");
+
         when(directoryService.searchLawyers("Family", "Mumbai", true)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryLawyers()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/lawyers")
                 .param("specialization", "Family")
                 .param("location", "Mumbai")
-                .param("verified", "true"))
+                .param("verified", "true")
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         verify(directoryService).searchLawyers("Family", "Mumbai", true);
@@ -50,12 +53,15 @@ class MilestoneApiIntegrationTest {
 
     @Test
     void getNgos_verifiedFalse_passesFiltersToService() throws Exception {
+        String token = jwtService.generateAccessToken("citizen@test.com", "CITIZEN");
+
         when(directoryService.getNgos("Delhi", false)).thenReturn(Collections.emptyList());
         when(directoryService.getAllDirectoryNgos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/directory/ngos")
                 .param("location", "Delhi")
-                .param("verified", "false"))
+                .param("verified", "false")
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         verify(directoryService).getNgos("Delhi", false);
