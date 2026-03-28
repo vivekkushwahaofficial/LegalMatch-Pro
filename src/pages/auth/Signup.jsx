@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const schema = yup.object({
   name: yup.string().required("Name is required"),
@@ -23,7 +25,7 @@ const schema = yup.object({
 
   role: yup
     .string()
-    .oneOf(["Citizen", "Lawyer", "NGO", "Admin"])
+    .oneOf(["Citizen", "Lawyer", "NGO"]) // ❌ Admin removed
     .required("Role is required"),
 
   specialization: yup.string().when("role", {
@@ -41,6 +43,9 @@ const schema = yup.object({
 
 function Signup() {
   const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -95,71 +100,76 @@ function Signup() {
           {/* Name */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Name</label>
-            <input
-              {...register("name")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
+            <input {...register("name")} className="w-full px-3 py-2 border rounded-lg" />
             <p className="text-red-500 text-sm">{errors.name?.message}</p>
           </div>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Email</label>
-            <input
-              {...register("email")}
-              type="email"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
+            <label>Email</label>
+            <input {...register("email")} type="email" className="w-full px-3 py-2 border rounded-1g" />
             <p className="text-red-500 text-sm">{errors.email?.message}</p>
           </div>
 
           {/* Password */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Password</label>
-            <input
-              {...register("password")}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-            <p className="text-red-500 text-sm">{errors.password?.message}</p>
-          </div>
+          <div className="mb-4 relative">
+  <label className="block text-gray-700 mb-2">Password</label>
+
+  <input
+    {...register("password")}
+    type={showPassword ? "text" : "password"}
+    className="w-full px-3 py-2 border rounded-lg pr-10"
+  />
+
+  <span
+    className="absolute right-3 top-11 cursor-pointer text-gray-600"
+    onClick={() => setShowPassword(!showPassword)}
+  >
+    {showPassword ? <FaEyeSlash /> : <FaEye />}
+  </span>
+
+  <p className="text-red-500 text-sm">{errors.password?.message}</p>
+</div>
 
           {/* Confirm Password */}
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Confirm Password</label>
-            <input
-              {...register("confirmPassword")}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-            <p className="text-red-500 text-sm">
-              {errors.confirmPassword?.message}
-            </p>
-          </div>
+          <div className="mb-4 relative">
+  <label className="block text-gray-700 mb-2">Confirm Password</label>
+
+  <input
+    {...register("confirmPassword")}
+    type={showConfirmPassword ? "text" : "password"}
+    className="w-full px-3 py-2 border rounded-lg pr-10"
+  />
+
+  <span
+    className="absolute right-3 top-11 cursor-pointer text-gray-600"
+    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+  >
+    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+  </span>
+
+  <p className="text-red-500 text-sm">
+    {errors.confirmPassword?.message}
+  </p>
+</div>
 
           {/* Role */}
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Role</label>
-            <select
-              {...register("role")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            >
+            <label>Role</label>
+            <select {...register("role")} className="w-full px-3 py-2 border rounded-lg">
               <option value="">Select Role</option>
               <option value="Citizen">Citizen</option>
               <option value="Lawyer">Lawyer</option>
               <option value="NGO">NGO</option>
-              <option value="Admin">Admin</option>
             </select>
           </div>
 
+          {/* Lawyer fields remain same */}
           {watch("role") === "Lawyer" && (
             <>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Specialization</label>
-                <select
-                  {...register("specialization")}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
+                <label>Specialization</label>
+                <select {...register("specialization")} className="w-full px-3 py-2 border rounded-lg">
                   <option value="">Select Specialization</option>
                   <option value="Criminal">Criminal</option>
                   <option value="Civil">Civil</option>
@@ -167,53 +177,27 @@ function Signup() {
                   <option value="Family">Family</option>
                   <option value="Property">Property</option>
                 </select>
-                <p className="text-red-500 text-sm">
-                  {errors.specialization?.message}
-                </p>
               </div>
 
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Location</label>
-
-                <select
-                  {...register("location")}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
+                <label>Location</label>
+                <select {...register("location")} className="w-full px-3 py-2 border rounded-lg">
                   <option value="">Select Location</option>
-                  <option value="Bhopal">Bhopal</option>
-                  <option value="Indore">Indore</option>
                   <option value="Delhi">Delhi</option>
                   <option value="Mumbai">Mumbai</option>
                   <option value="Other">Other</option>
                 </select>
-
-                {/* 👇 Show input if Other selected */}
-                {watch("location") === "Other" && (
-                  <input
-                    {...register("location")}
-                    placeholder="Enter your location"
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                )}
-
-                <p className="text-red-500 text-sm">
-                  {errors.location?.message}
-                </p>
               </div>
             </>
           )}
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-          >
+
+          <button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
             Sign Up
           </button>
 
-          <p className="text-center text-sm text-gray-500 mt-4">
+          <p className="text-center mt-4 text-sm">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-500 hover:text-blue-700">
-              Sign In
-            </Link>
+            <Link to="/login" className="text-blue-500">Sign In</Link>
           </p>
 
         </form>

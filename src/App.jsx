@@ -3,46 +3,62 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+// Pages
 import LandingPage from "./pages/LandingPage";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
+
+// Directories
 import LawyerDirectory from "./pages/directory/LawyerDirectory";
 import NgoDirectory from "./pages/directory/NgoDirectory";
 
+// Dashboards
 import CitizenDashboard from "./pages/dashboard/CitizenDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import NGODashboard from "./pages/dashboard/NGODashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 
+// Cases
 import CaseSubmission from "./pages/cases/CaseSubmission";
 import CaseList from "./pages/cases/CaseList";
 import CaseDetail from "./pages/cases/CaseDetail";
+import AssignedCases from "./components/cases/AssignedCases";
 
+// Matching
 import Matching from "./pages/matching/Matches";
 
+// Profiles
 import LawyerProfile from "./pages/profiles/LawyerProfile";
-import AssignedCases from "./components/cases/AssignedCases";
+import Profile from "./pages/profiles/Profile";
+
+// Chat
 import ChatPage from "./pages/chat/ChatPage";
 import RequestsInbox from "./pages/chat/RequestsInbox";
-import Profile from "./pages/profiles/Profile";
+
+// Admin Logs
 import AdminLogs from "./AdminLogs";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* Public Routes */}
+        {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/directories/lawyers" element={<LawyerDirectory />} />
-        <Route path="/directories/ngos" element={<NgoDirectory />} />
         <Route path="/login" element={<Signin />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Signup />} />
-        <Route path="/case/:id" element={<CaseDetail />} />
-        
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Admin */}
+        {/* Directories */}
+        <Route path="/directories/lawyers" element={<LawyerDirectory />} />
+        <Route path="/directories/ngos" element={<NgoDirectory />} />
+
+        {/* Case detail */}
+        <Route path="/case/:id" element={<CaseDetail />} />
+
+        {/* ================= ADMIN ================= */}
         <Route
           path="/admin"
           element={
@@ -51,11 +67,11 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="/admin/logs" element={<AdminLogs />} />
           <Route index element={<AdminDashboard />} />
+          <Route path="logs" element={<AdminLogs />} />
         </Route>
 
-        {/* Lawyer */}
+        {/* ================= LAWYER ================= */}
         <Route
           path="/lawyer"
           element={
@@ -67,9 +83,10 @@ function App() {
           <Route index element={<LawyerDashboard />} />
           <Route path="requests" element={<RequestsInbox />} />
           <Route path="directory" element={<LawyerDirectory />} />
+          <Route path="profile" element={<LawyerProfile />} />
         </Route>
 
-        {/* Citizen */}
+        {/* ================= CITIZEN ================= */}
         <Route
           path="/citizen"
           element={
@@ -89,7 +106,7 @@ function App() {
           <Route path="matches" element={<Matching />} />
         </Route>
 
-        {/* NGO */}
+        {/* ================= NGO ================= */}
         <Route
           path="/ngo"
           element={
@@ -102,7 +119,7 @@ function App() {
           <Route path="requests" element={<RequestsInbox />} />
         </Route>
 
-        {/* Other */}
+        {/* ================= EXTRA ROUTES ================= */}
         <Route path="/lawyer-profile/:id" element={<LawyerProfile />} />
         <Route path="/assigned-cases" element={<AssignedCases />} />
 
