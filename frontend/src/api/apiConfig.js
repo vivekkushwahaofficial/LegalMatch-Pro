@@ -1,13 +1,30 @@
+import axios from "axios";
+
 const API_BASE_URL = "http://localhost:8080/api";
 const REFRESH_SKEW_SECONDS = 60;
 
-const parseResponseBody = async (response) => {
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return response.json();
-  }
-  return response.text();
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const clearSessionStorage = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
 };
+
+const setTokenPayload = (data) => {
+  localStorage.setItem("accessToken", data.accessToken);
+  if (data.role) localStorage.setItem("role", data.role);
+  if (data.name) localStorage.setItem("userName", data.name);
+  if (data.userId) localStorage.setItem("userId", String(data.userId));
+};
+
+let refreshPromise = null;
 
 const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
@@ -15,24 +32,24 @@ const refreshAccessToken = async () => {
     return null;
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  const data = await parseResponseBody(response);
-  if (!response.ok || !data?.accessToken) {
-    return null;
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken })
+      .then((response) => {
+        const data = response?.data;
+        if (!data?.accessToken) {
+          return null;
+        }
+        setTokenPayload(data);
+        return data.accessToken;
+      })
+      .catch(() => null)
+      .finally(() => {
+        refreshPromise = null;
+      });
   }
 
-  localStorage.setItem("accessToken", data.accessToken);
-  if (data.role) localStorage.setItem("role", data.role);
-  if (data.name) localStorage.setItem("userName", data.name);
-  if (data.userId) localStorage.setItem("userId", String(data.userId));
-  return data.accessToken;
+  return refreshPromise;
 };
 
 const parseJwtPayload = (token) => {
@@ -70,53 +87,59 @@ export const getValidAccessToken = async () => {
   return token || null;
 };
 
+apiClient.interceptors.request.use(async (config) => {
+  const token = await getValidAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error?.config;
+    const status = error?.response?.status;
+
+    if (status !== 401 || !originalRequest || originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    if (originalRequest.url?.includes("/auth/login") || originalRequest.url?.includes("/auth/refresh-token")) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+    const newToken = await refreshAccessToken();
+
+    if (!newToken) {
+      clearSessionStorage();
+      return Promise.reject(error);
+    }
+
+    originalRequest.headers = originalRequest.headers || {};
+    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+    return apiClient(originalRequest);
+  }
+);
+
 export const apiCall = async (endpoint, method, data = null) => {
-
-  const doRequest = async (token, allowRefreshRetry) => {
-    const options = {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    if (token) {
-      options.headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    if (data) {
-      options.body = JSON.stringify(data);
-    }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-    const result = await parseResponseBody(response);
-
-    if (response.status === 401 && allowRefreshRetry) {
-      const newAccessToken = await refreshAccessToken();
-      if (newAccessToken) {
-        return doRequest(newAccessToken, false);
-      }
-
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userId");
-      throw new Error("Session expired. Please sign in again.");
-    }
-
-    if (!response.ok) {
-      throw new Error(result.message || result || "API request failed");
-    }
-
-    return result;
-  };
-
   try {
-    const token = await getValidAccessToken();
-    return await doRequest(token, true);
+    const response = await apiClient({
+      url: endpoint,
+      method,
+      data,
+    });
+    return response.data;
   } catch (error) {
-    console.error("API Call Error:", error);
-    throw error;
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data ||
+      error?.message ||
+      "API request failed";
+    throw new Error(message);
   }
 };
+
+export { apiClient };
 

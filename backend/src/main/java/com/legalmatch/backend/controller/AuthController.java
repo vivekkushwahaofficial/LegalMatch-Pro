@@ -1,16 +1,25 @@
 package com.legalmatch.backend.controller;
 
-import com.legalmatch.backend.dto.LoginRequest;
-import com.legalmatch.backend.dto.RegisterRequest;
-import com.legalmatch.backend.service.AuthService;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.legalmatch.backend.dto.ForgotPasswordRequest;
+import com.legalmatch.backend.dto.LoginRequest;
+import com.legalmatch.backend.dto.RefreshTokenRequest;
+import com.legalmatch.backend.dto.RegisterRequest;
+import com.legalmatch.backend.dto.ResetPasswordRequest;
+import com.legalmatch.backend.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping({"/api/auth", "/auth"})
 public class AuthController {
 
     private final AuthService authService;
@@ -32,8 +41,20 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public Map<String, String> refreshToken(@RequestBody Map<String, String> request) {
+    public Map<String, String> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
 
         return authService.refreshToken(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public Map<String, String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+
+        return Map.of("message", authService.forgotPassword(request));
+    }
+
+    @PostMapping("/reset-password")
+    public Map<String, String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+
+        return Map.of("message", authService.resetPassword(request));
     }
 }

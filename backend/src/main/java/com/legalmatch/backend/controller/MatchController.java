@@ -16,7 +16,7 @@ import com.legalmatch.backend.dto.MatchResponse;
 import com.legalmatch.backend.service.MatchingService;
 
 @RestController
-@RequestMapping("/api/matches")
+@RequestMapping({"/api/matches", "/matches", "/api/matching"})
 public class MatchController {
 
     private final MatchingService matchingService;

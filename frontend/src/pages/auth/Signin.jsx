@@ -1,10 +1,12 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { Eye, EyeOff } from "lucide-react";
+import { apiClient } from "../../api/apiConfig";
 
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -15,6 +17,7 @@ function Signin() {
 
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -27,24 +30,13 @@ function Signin() {
   // Runs when user clicks Sign In
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
+      const response = await apiClient.post("/auth/login", {
+        email: data.email,
+        password: data.password,
       });
 
-      const result = await response.json();
+      const result = response.data;
       console.log("Login API Response:", result);
-
-      if (!response.ok) {
-        alert(result.message || "Invalid email or password");
-        return;
-      }
 
       // Save token using AuthContext
       login(result.accessToken);
@@ -69,7 +61,7 @@ function Signin() {
 
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed. Please try again.");
+      alert(error?.response?.data?.message || error?.message || "Login failed. Please try again.");
     }
   };
 
@@ -104,11 +96,23 @@ function Signin() {
               Password
             </label>
 
-            <input
-              {...register("password")}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
+            <div className="relative">
+              <input
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg"
+              />
+
+              {/* Toggle password visibility without affecting form submission */}
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
             <p className="text-red-500 text-sm mt-1">
               {errors.password?.message}
@@ -121,6 +125,8 @@ function Signin() {
           >
             Sign In
           </button>
+
+          {/* Removed Forgot Password action as requested; login flow and password toggle remain unchanged. */}
 
           <p className="text-center text-sm text-gray-500 mt-4">
             Don't have an account?{" "}

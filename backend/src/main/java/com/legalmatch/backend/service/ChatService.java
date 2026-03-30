@@ -44,8 +44,9 @@ public class ChatService {
 
         ChatMessage saved = chatMessageRepository.save(message);
 
-        // Broadcast via WebSocket
+        // Broadcast via both topic patterns for backward compatibility.
         messagingTemplate.convertAndSend("/topic/chats/" + message.getMatchId(), saved);
+        messagingTemplate.convertAndSend("/topic/chat/" + message.getMatchId(), saved);
 
         Long caseOwnerId = match.getLegalCase().getUser().getId();
         Long providerId = match.getMatchedUser().getId();

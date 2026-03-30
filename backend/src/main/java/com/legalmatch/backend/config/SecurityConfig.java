@@ -42,19 +42,32 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 // Allow browser preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Public APIs (Relaxed for testing as requested)
+                // Public auth and health APIs
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/directory/**").authenticated()
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Authenticated users
+                .requestMatchers(HttpMethod.POST, "/api/cases", "/cases").hasRole("CITIZEN")
                 .requestMatchers("/api/cases/**").authenticated()
+                .requestMatchers("/cases/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
+                .requestMatchers("/profile/**").authenticated()
                 .requestMatchers("/api/matches/**").authenticated()
+                .requestMatchers("/matches/**").authenticated()
+                .requestMatchers("/api/matching/**").authenticated()
+                .requestMatchers("/api/directory/**").authenticated()
+                .requestMatchers("/directory/**").authenticated()
                 .requestMatchers("/api/chats/**").authenticated()
+                .requestMatchers("/chats/**").authenticated()
+                .requestMatchers("/api/chat/**").authenticated()
                 .requestMatchers("/api/appointments/**").authenticated()
+                .requestMatchers("/appointments/**").authenticated()
                 .requestMatchers("/api/notifications/**").authenticated()
+                .requestMatchers("/notifications/**").authenticated()
                 // Everything else requires login
                 .anyRequest().authenticated()
                 )

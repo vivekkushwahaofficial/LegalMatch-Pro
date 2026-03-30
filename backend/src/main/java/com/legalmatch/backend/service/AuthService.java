@@ -3,12 +3,20 @@ package com.legalmatch.backend.service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.legalmatch.backend.dto.ForgotPasswordRequest;
 import com.legalmatch.backend.dto.LoginRequest;
+import com.legalmatch.backend.dto.RefreshTokenRequest;
 import com.legalmatch.backend.dto.RegisterRequest;
+import com.legalmatch.backend.dto.ResetPasswordRequest;
 import com.legalmatch.backend.entity.LawyerProfile;
 import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.entity.Role;
@@ -22,11 +30,16 @@ import com.legalmatch.backend.security.JwtService;
 @Service
 public class AuthService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);
+
     private final UserRepository userRepository;
     private final LawyerProfileRepository lawyerProfileRepository;
     private final NgoProfileRepository ngoProfileRepository;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Value("${app.auth.admin-invite-code:}")
+    private String adminInviteCode;
 
     public AuthService(UserRepository userRepository,
             LawyerProfileRepository lawyerProfileRepository,
@@ -48,16 +61,16 @@ public class AuthService {
         }
 
         // Step 2: Decide role
-        Role role;
+        Role role = parseRole(request.getRole());
 
-        if (request.getRole().equalsIgnoreCase("LAWYER")) {
-            role = Role.LAWYER;
-        } else if (request.getRole().equalsIgnoreCase("NGO")) {
-            role = Role.NGO;
-        } else if (request.getRole().equalsIgnoreCase("ADMIN")) {
-            throw new RuntimeException("Admin registration is not allowed");
-        } else {
-            role = Role.CITIZEN;
+        if (role == Role.ADMIN) {
+            boolean hasConfiguredInvite = adminInviteCode != null && !adminInviteCode.isBlank();
+            boolean inviteMatches = hasConfiguredInvite
+                    && Objects.equals(adminInviteCode, request.getAdminInviteCode());
+
+            if (!inviteMatches) {
+                throw new RuntimeException("Admin registration is not allowed");
+            }
         }
 
         // Step 3: Validate BEFORE saving
@@ -128,9 +141,9 @@ public class AuthService {
         return tokens;
     }
 
-    public Map<String, String> refreshToken(Map<String, String> request) {
+    public Map<String, String> refreshToken(RefreshTokenRequest request) {
 
-        String refreshToken = request.get("refreshToken");
+        String refreshToken = request.getRefreshToken();
 
         if (refreshToken == null || !jwtService.isTokenValid(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
@@ -154,5 +167,45 @@ public class AuthService {
         response.put("userId", String.valueOf(user.getId()));
 
         return response;
+    }
+
+    private Role parseRole(String roleValue) {
+        try {
+            return Role.valueOf(roleValue.trim().toUpperCase());
+        } catch (Exception ex) {
+            throw new RuntimeException("Invalid role");
+        }
+    }
+
+    public String forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create short-lived reset token (15 minutes).
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+
+        // Simulate email sending by logging the reset token.
+        LOGGER.info("Password reset token for {} is {}", user.getEmail(), token);
+
+        return "Reset link sent";
+    }
+
+    public String resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Reset token has expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return "Password updated successfully";
     }
 }

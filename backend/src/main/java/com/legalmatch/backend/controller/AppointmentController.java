@@ -1,13 +1,20 @@
 package com.legalmatch.backend.controller;
 
-import com.legalmatch.backend.entity.Appointment;
-import com.legalmatch.backend.service.AppointmentService;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.legalmatch.backend.entity.Appointment;
+import com.legalmatch.backend.service.AppointmentService;
+
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping({"/api/appointments", "/appointments"})
 public class AppointmentController {
 
     private final AppointmentService service;

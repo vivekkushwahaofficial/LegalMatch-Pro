@@ -66,6 +66,11 @@ public class CaseService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Defense-in-depth: only citizens can submit new cases.
+        if (user.getRole() != Role.CITIZEN) {
+            throw new RuntimeException("Only citizens can submit cases");
+        }
+
         caseRequest.setUser(user);
         caseRequest.setStatus("SUBMITTED");
 
@@ -97,7 +102,7 @@ public class CaseService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return caseRepository.findByUser(user)
+        return caseRepository.findByUserId(user.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();

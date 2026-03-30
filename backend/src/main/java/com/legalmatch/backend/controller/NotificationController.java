@@ -13,7 +13,7 @@ import com.legalmatch.backend.entity.Notification;
 import com.legalmatch.backend.service.NotificationService;
 
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping({"/api/notifications", "/notifications"})
 public class NotificationController {
 
     private final NotificationService notificationService;

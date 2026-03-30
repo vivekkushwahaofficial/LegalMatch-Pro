@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
+import { apiClient } from "../../api/apiConfig";
 
 const schema = yup.object({
   name: yup.string().required("Name is required"),
@@ -23,7 +24,7 @@ const schema = yup.object({
 
   role: yup
     .string()
-    .oneOf(["Citizen", "Lawyer", "NGO"])
+    .oneOf(["Citizen", "Lawyer", "NGO", "Admin"])
     .required("Role is required"),
 
   specialization: yup.string().when("role", {
@@ -37,6 +38,12 @@ const schema = yup.object({
     then: (schema) => schema.required("Location is required"),
     otherwise: (schema) => schema.notRequired(),
   }),
+
+  adminInviteCode: yup.string().when("role", {
+    is: "Admin",
+    then: (schema) => schema.required("Admin invite code is required"),
+    otherwise: (schema) => schema.notRequired(),
+  })
 });
 
 function Signup() {
@@ -53,34 +60,22 @@ function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-          role: data.role.toUpperCase(),
-          specialization: data.specialization || null,
-          location: data.location || null
-        })
+      await apiClient.post("/auth/register", {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role.toUpperCase(),
+        specialization: data.specialization || null,
+        location: data.location || null,
+        adminInviteCode: data.adminInviteCode || null,
       });
-
-      const result = await response.text();
-
-      if (!response.ok) {
-        alert(result);
-        return;
-      }
 
       alert("Registration successful! Please login.");
       navigate("/login");
 
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Registration failed");
+      alert(error?.response?.data?.message || error?.message || "Registration failed");
     }
   };
 
@@ -148,6 +143,7 @@ function Signup() {
               <option value="Citizen">Citizen</option>
               <option value="Lawyer">Lawyer</option>
               <option value="NGO">NGO</option>
+              <option value="Admin">Admin</option>
             </select>
           </div>
 
@@ -201,6 +197,19 @@ function Signup() {
               </div>
             </>
           )}
+
+          {watch("role") === "Admin" && (
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Admin Invite Code</label>
+              <input
+                {...register("adminInviteCode")}
+                type="password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+              <p className="text-red-500 text-sm">{errors.adminInviteCode?.message}</p>
+            </div>
+          )}
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"

@@ -9,8 +9,21 @@ export default function NGODashboard() {
   const loadCases = async () => {
     try {
       const data = await apiCall("/matches/my", "GET");
-      const list = Array.isArray(data) ? data : [];
-      setCases(list.filter((m) => String(m.matchStatus || "").toUpperCase() === "REQUESTED"));
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.matches)
+            ? data.matches
+            : [];
+
+      // NGOs should be able to act on newly assigned matches before chat requests are sent.
+      setCases(
+        list.filter((m) => {
+          const status = String(m.matchStatus || "").toUpperCase();
+          return status === "PENDING" || status === "REQUESTED";
+        })
+      );
     } catch (error) {
       console.error("Failed to load NGO assignments", error);
       setCases([]);
@@ -51,7 +64,7 @@ export default function NGODashboard() {
       </Link>
 
       {cases.length === 0 ? (
-        <p>No assigned cases</p>
+        <p>No pending case requests right now.</p>
       ) : (
         <div className="grid grid-cols-2 gap-6">
 

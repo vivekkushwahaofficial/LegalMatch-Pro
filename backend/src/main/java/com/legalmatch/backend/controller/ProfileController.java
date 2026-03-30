@@ -1,13 +1,18 @@
 package com.legalmatch.backend.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.legalmatch.backend.dto.ProfileResponse;
 import com.legalmatch.backend.dto.ProfileUpdateRequest;
 import com.legalmatch.backend.service.ProfileService;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping({"/api/profile", "/profile"})
 public class ProfileController {
 
     private final ProfileService profileService;

@@ -1,7 +1,9 @@
 package com.legalmatch.backend.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -19,7 +21,7 @@ import com.legalmatch.backend.entity.NgoProfile;
 import com.legalmatch.backend.service.DirectoryService;
 
 @RestController
-@RequestMapping("/api/directory")
+@RequestMapping({"/api/directory", "/directory"})
 public class DirectoryController {
 
     private static final int MAX_FILTER_LENGTH = 80;
@@ -33,11 +35,17 @@ public class DirectoryController {
 
     @GetMapping("/lawyers")
     public List<LawyerDirectoryResponse> getLawyers(
+            @RequestParam(required = false) String expertise,
             @RequestParam(required = false) String specialization,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) Boolean verified
+            @RequestParam(required = false) Boolean verified,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        final String normalizedSpecialization = sanitizeFilter(specialization, "specialization");
+        final String effectiveSpecialization = specialization != null ? specialization : expertise;
+        final String normalizedSpecialization = sanitizeFilter(effectiveSpecialization, "specialization");
         final String normalizedLocation = sanitizeFilter(location, "location");
 
         List<LawyerDirectoryResponse> mergedList = new ArrayList<>();
@@ -56,14 +64,20 @@ public class DirectoryController {
                 .map(this::mapLawyerDirectory)
                 .collect(Collectors.toList()));
 
-        return mergedList;
+        return paginateAndSortLawyers(mergedList, page, size, sortBy, sortDir);
     }
 
     @GetMapping("/ngos")
     public List<NgoDirectoryResponse> getNgos(
+            @RequestParam(required = false) String expertise,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) Boolean verified
+            @RequestParam(required = false) Boolean verified,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "ngoName") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
     ) {
+        final String normalizedExpertise = sanitizeFilter(expertise, "expertise");
         final String normalizedLocation = sanitizeFilter(location, "location");
 
         List<NgoDirectoryResponse> mergedList = new ArrayList<>();
@@ -71,17 +85,20 @@ public class DirectoryController {
         List<NgoProfile> profiles = directoryService.getNgos(normalizedLocation, verified);
         mergedList.addAll(profiles.stream()
                 .filter(p -> p.getUser() != null)
+                .filter(p -> normalizedExpertise == null
+                || (p.getSpecialization() != null && p.getSpecialization().equalsIgnoreCase(normalizedExpertise)))
                 .map(this::mapNgoProfile)
                 .collect(Collectors.toList()));
 
         List<NgoDirectory> directoryNgos = directoryService.getAllDirectoryNgos();
         mergedList.addAll(directoryNgos.stream()
-                .filter(n -> (normalizedLocation == null || n.getLocation().equalsIgnoreCase(normalizedLocation))
+                .filter(n -> (normalizedExpertise == null || (n.getExpertise() != null && n.getExpertise().equalsIgnoreCase(normalizedExpertise)))
+                && (normalizedLocation == null || n.getLocation().equalsIgnoreCase(normalizedLocation))
                 && (verified == null || (n.getVerified() != null && n.getVerified().equals(verified))))
                 .map(this::mapNgoDirectory)
                 .collect(Collectors.toList()));
 
-        return mergedList;
+        return paginateAndSortNgos(mergedList, page, size, sortBy, sortDir);
     }
 
     private LawyerDirectoryResponse mapLawyerProfile(LawyerProfile profile) {
@@ -120,6 +137,72 @@ public class DirectoryController {
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
         dto.setOrganizationDetails(dir.getOrganizationDetails());
         return dto;
+    }
+
+    private List<LawyerDirectoryResponse> paginateAndSortLawyers(
+            List<LawyerDirectoryResponse> input,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        Comparator<LawyerDirectoryResponse> comparator = switch (safe(sortBy)) {
+            case "specialization", "expertise" ->
+                Comparator.comparing(v -> safe(v.getSpecialization()));
+            case "location" ->
+                Comparator.comparing(v -> safe(v.getLocation()));
+            case "verified" ->
+                Comparator.comparing(LawyerDirectoryResponse::isVerified);
+            default ->
+                Comparator.comparing(v -> safe(v.getName()));
+        };
+
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            comparator = comparator.reversed();
+        }
+
+        return paginate(input.stream().sorted(comparator).toList(), safePage, safeSize);
+    }
+
+    private List<NgoDirectoryResponse> paginateAndSortNgos(
+            List<NgoDirectoryResponse> input,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        Comparator<NgoDirectoryResponse> comparator = switch (safe(sortBy)) {
+            case "location" ->
+                Comparator.comparing(v -> safe(v.getLocation()));
+            case "verified" ->
+                Comparator.comparing(NgoDirectoryResponse::isVerified);
+            default ->
+                Comparator.comparing(v -> safe(v.getNgoName()));
+        };
+
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            comparator = comparator.reversed();
+        }
+
+        return paginate(input.stream().sorted(comparator).toList(), safePage, safeSize);
+    }
+
+    private <T> List<T> paginate(List<T> sortedList, int page, int size) {
+        int fromIndex = page * size;
+        if (fromIndex >= sortedList.size()) {
+            return List.of();
+        }
+
+        int toIndex = Math.min(fromIndex + size, sortedList.size());
+        return sortedList.subList(fromIndex, toIndex);
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     private String sanitizeFilter(String input, String fieldName) {

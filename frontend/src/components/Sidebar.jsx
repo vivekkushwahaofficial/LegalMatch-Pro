@@ -18,7 +18,8 @@ import {
   FolderOpen,
   ClipboardList,
   MessageCircle,
-  CalendarDays
+  CalendarDays,
+  Bell
 
 } from 'lucide-react';
 
@@ -46,8 +47,10 @@ const Sidebar = ({ role }) => {
     if (role === 'admin') {
       return [
         { name: 'Admin Panel', path: '/admin', icon: Settings },
+        { name: 'Profile Management', path: '/admin/profile', icon: User },
         { name: 'Lawyer Directory', path: '/directories/lawyers', icon: Search },
         { name: 'NGO Directory', path: '/directories/ngos', icon: Building2 },
+        { name: 'Notifications', path: '/admin/notifications', icon: Bell },
       ];
     }
 
@@ -55,13 +58,17 @@ const Sidebar = ({ role }) => {
     switch (role) {
       case 'lawyer': return [
         { name: 'My Cases', path: '/lawyer', icon: Briefcase },
+        { name: 'Profile Management', path: '/lawyer/profile', icon: User },
         { name: 'Chat', path: '/lawyer/chat', icon: MessageCircle },
         { name: 'Appointments', path: '/lawyer/appointments', icon: CalendarDays },
+        { name: 'Notifications', path: '/lawyer/notifications', icon: Bell },
       ];
       case 'ngo': return [
         { name: 'Impact Dashboard', path: '/ngo', icon: Building2 },
+        { name: 'Profile Management', path: '/ngo/profile', icon: User },
         { name: 'Chat', path: '/ngo/chat', icon: MessageCircle },
         { name: 'Appointments', path: '/ngo/appointments', icon: CalendarDays },
+        { name: 'Notifications', path: '/ngo/notifications', icon: Bell },
       ];
       case 'citizen':
         return [
@@ -73,6 +80,7 @@ const Sidebar = ({ role }) => {
           { name: 'Impact Dashboard', path: '/citizen', icon: BarChart },
           { name: 'Chat', path: '/citizen/chat', icon: MessageCircle },
           { name: 'Appointments', path: '/citizen/appointments', icon: CalendarDays },
+          { name: 'Notifications', path: '/citizen/notifications', icon: Bell },
         ];
       default: return [];
     }
