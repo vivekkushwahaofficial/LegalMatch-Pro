@@ -83,12 +83,7 @@ const AdminDashboard = () => {
         >
           System Logs
         </button>
-        <button
-          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 ${activeTab === 'settings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('settings')}
-        >
-          App Settings
-        </button>
+        
         
  
       </div>
@@ -110,6 +105,8 @@ const AdminDashboard = () => {
               />
             </div>
           </div>
+          <div className="p-6 space-y-6">
+</div>
 
           {/* Table */}
           <div className="overflow-x-auto">

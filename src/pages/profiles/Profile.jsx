@@ -6,7 +6,7 @@ export default function Profile() {
 
   const [user, setUser] = useState({
     name: "Dharshini",
-    email: "dharshini@6521gmail.com",
+    email: "dharshini6521@gmail.com",
     role: "Citizen",
     location: "Chennai",
     photo: "https://i.pravatar.cc/150?img=5"

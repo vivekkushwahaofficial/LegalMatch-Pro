@@ -38,6 +38,17 @@ import RequestsInbox from "./pages/chat/RequestsInbox";
 // Admin Logs
 import AdminLogs from "./AdminLogs";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import Users from "./pages/admin/Users";
+import Directory from "./pages/admin/Directory";
+import Cases from "./pages/admin/Cases";
+import Analytics from "./pages/admin/Analytics";
+import Settings from "./pages/admin/Settings";
+import AISettings from "./pages/admin/AISettings";
+import CaseSettings from "./pages/admin/CaseSettings";
+import GeneralSettings from "./pages/admin/GeneralSettings";
+import NotificationSettings from "./pages/admin/NotificationSettings";
+import SecuritySettings from "./pages/admin/SecuritySettings";
+import UserSettings from "./pages/admin/UserSettings";
 
 function App() {
   return (
@@ -60,17 +71,25 @@ function App() {
 
         {/* ================= ADMIN ================= */}
         <Route
-          path="/admin"
-          element={
-            <PrivateRoute>
-              <DashboardLayout role="admin" />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="logs" element={<AdminLogs />} />
-        </Route>
+  path="/admin"
+  element={
+    <PrivateRoute>
+      <DashboardLayout role="admin" />
+    </PrivateRoute>
+  }
+>
+  {/* Default page */}
+  <Route index element={<AdminDashboard />} />
 
+  {/* ✅ Add all these routes */}
+  <Route path="dashboard" element={<AdminDashboard />} />
+  <Route path="users" element={<Users />} />
+  <Route path="directory" element={<Directory />} />
+  <Route path="cases" element={<Cases />} />
+  <Route path="analytics" element={<Analytics />} />
+  <Route path="system-logs" element={<AdminLogs />} />
+  <Route path="settings" element={<Settings />} />
+</Route>
         {/* ================= LAWYER ================= */}
         <Route
           path="/lawyer"

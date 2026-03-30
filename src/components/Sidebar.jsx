@@ -43,15 +43,22 @@ const Sidebar = ({ role }) => {
     // For the purpose of "matching the image", we'll use the Admin view as the primary example
     // but keep the role logic for other users.
     if (role === 'admin') {
-      return [
-        { name: 'Profile Management', path: '/admin/profiles', icon: User },
-        { name: 'Case Submission', path: '/admin/cases', icon: FolderOpen },
-        { name: 'Directory', path: '/admin/directory', icon: Search },
-        { name: 'Matches', path: '/admin/matches', icon: Shield },
-        { name: 'Impact Dashboard', path: '/admin/impact', icon: BarChart },
-        { name: 'Admin Panel', path: '/admin', icon: Settings },
-      ];
-    }
+  return [
+    { name: 'Dashboard', path: '/admin/dashboard', icon: BarChart },
+
+    { name: 'Users', path: '/admin/users', icon: FolderOpen },
+
+    { name: 'Lawyer Directory', path: '/admin/directory', icon: Search },
+
+    { name: 'Cases', path: '/admin/cases', icon: Shield },
+
+    { name: 'Analytics', path: '/admin/analytics', icon: BarChart },
+
+    
+
+    { name: 'Settings', path: '/admin/settings', icon: Settings },
+  ];
+}
 
     // Role specific fallbacks
     switch (role) {
@@ -65,7 +72,7 @@ const Sidebar = ({ role }) => {
           { name: 'Directory', path: '/citizen/lawyers', icon: Search },
           { name: 'Matches', path: '/citizen/matches', icon: Shield },
           { name: 'Impact Dashboard', path: '/citizen', icon: BarChart },
-          { name: 'Chat', path: '/chat', icon: MessageCircle },
+          { name: 'Chat', path: '/citizen/chat', icon: MessageCircle },
         ];
       default: return [];
     }
