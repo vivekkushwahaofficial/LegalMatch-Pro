@@ -25,7 +25,7 @@ const RequestsInbox = () => {
 
   const handleAction = async (matchId, approved) => {
     try {
-      const endpoint = approved ? `/matches/${matchId}/approve` : `/matches/${matchId}/reject`;
+      const endpoint = approved ? `/matches/${matchId}/accept` : `/matches/${matchId}/reject`;
       await apiCall(endpoint, "PUT");
       setRequests(requests.filter(r => r.matchId !== matchId));
       alert(approved ? "Request Approved!" : "Request Rejected!");
@@ -75,7 +75,7 @@ const RequestsInbox = () => {
                   )}
 
                   {req.attachmentUrl && (
-                    <div className="flex items-center gap-2 text-sm text-blue-600 font-medium bg-blue-50 px-3 py-2 rounded-lg inline-flex">
+                    <div className="flex items-center gap-2 text-sm text-blue-600 font-medium bg-blue-50 px-3 py-2 rounded-lg w-fit">
                       <Paperclip className="w-4 h-4" />
                       <a href={req.attachmentUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
                         View Attachment
