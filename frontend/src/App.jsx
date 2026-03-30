@@ -12,7 +12,11 @@ import NgoDirectory from "./pages/directory/NgoDirectory";
 import CitizenDashboard from "./pages/dashboard/CitizenDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import NGODashboard from "./pages/dashboard/NGODashboard";
-import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import VerificationPage from "./pages/admin/VerificationPage";
+import AdminCases from "./pages/admin/AdminCases";
+import SystemLogs from "./pages/admin/SystemLogs";
 
 import CaseSubmission from "./pages/cases/CaseSubmission";
 import CaseList from "./pages/cases/CaseList";

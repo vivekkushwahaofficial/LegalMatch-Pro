@@ -37,6 +37,7 @@ public class CaseService {
     private CaseResponse mapToResponse(Case c) {
 
         CaseResponse response = new CaseResponse();
+        User caseOwner = c.getUser();
 
         response.setId(c.getId());
         response.setTitle(c.getTitle());
@@ -45,7 +46,8 @@ public class CaseService {
         response.setStatus(c.getStatus());
         response.setCreatedAt(c.getCreatedAt());
         response.setUpdatedAt(c.getUpdatedAt());
-        response.setUserEmail(c.getUser().getEmail());
+        // Null-safe mapping: legacy/bad rows may have no linked user.
+        response.setUserEmail(caseOwner != null ? caseOwner.getEmail() : "N/A");
         response.setLocation(c.getLocation());
         response.setKeywords(c.getKeywords());
         response.setDateTime(c.getDateTime());
@@ -164,8 +166,12 @@ public class CaseService {
         User requester = userRepository.findByEmail(requesterEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        User caseOwner = c.getUser();
+
         // Citizens can only read their own cases. Legal professionals and admins may read case details.
-        if (requester.getRole() == Role.CITIZEN && !c.getUser().getId().equals(requester.getId())) {
+        // Null-safe owner check to avoid NPE on orphaned case rows.
+        if (requester.getRole() == Role.CITIZEN
+                && (caseOwner == null || !caseOwner.getId().equals(requester.getId()))) {
             throw new RuntimeException("Not authorized to view this case");
         }
 

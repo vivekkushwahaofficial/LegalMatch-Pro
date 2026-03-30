@@ -9,6 +9,8 @@ import {
   Clock
 } from 'lucide-react';
 import ImpactDashboard from '../../components/dashboard/ImpactDashboard';
+import DirectoryIngestion from '../../components/dashboard/DirectoryIngestion';
+import AppSettings from '../../components/dashboard/AppSettings';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('userVerification');
@@ -226,8 +228,16 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {activeTab === 'directory' && (
+        <DirectoryIngestion />
+      )}
+
       {activeTab === 'logs' && (
         <ImpactDashboard />
+      )}
+
+      {activeTab === 'settings' && (
+        <AppSettings />
       )}
     </div>
   );

@@ -7,7 +7,10 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -99,6 +102,14 @@ public class DirectoryController {
                 .collect(Collectors.toList()));
 
         return paginateAndSortNgos(mergedList, page, size, sortBy, sortDir);
+    }
+
+    @PostMapping("/import")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> importDirectoryData() {
+        directoryService.importNgosFromExcel();
+        directoryService.importLawyersFromExternalApi();
+        return ResponseEntity.ok("Directory import triggered successfully");
     }
 
     private LawyerDirectoryResponse mapLawyerProfile(LawyerProfile profile) {
