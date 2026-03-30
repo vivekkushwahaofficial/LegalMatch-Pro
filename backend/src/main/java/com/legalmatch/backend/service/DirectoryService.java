@@ -102,7 +102,7 @@ public class DirectoryService {
 
             if (externalLawyers != null) {
                 for (ExternalLawyerDto dto : externalLawyers) {
-                    if (dto.getName() == null || dto.getCity() == null) {
+                    if (!hasText(dto.getName()) || !hasText(dto.getCity())) {
                         continue;
                     }
                     String normalizedLocation = dto.getCity().trim().toUpperCase();
@@ -126,7 +126,7 @@ public class DirectoryService {
         try {
             List<ExternalNgoDto> externalNgos = readNgosFromExcel("ngo_data.xlsx");
             for (ExternalNgoDto dto : externalNgos) {
-                if (dto.getOrg_name() == null || dto.getCity() == null) {
+                if (!hasText(dto.getOrg_name()) || !hasText(dto.getCity())) {
                     continue;
                 }
                 String normalizedLocation = dto.getCity().trim().toUpperCase();
@@ -197,5 +197,9 @@ public class DirectoryService {
             return list;
         }
         return list.stream().filter(n -> n.isVerified() == verified).toList();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

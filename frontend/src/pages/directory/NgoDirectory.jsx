@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, MapPin, Heart, ShieldCheck } from 'lucide-react';
 import { apiCall } from '../../api/apiConfig';
 
@@ -26,18 +27,39 @@ const NgoDirectory = () => {
   }, [expertise, location, verified, sortBy, sortDir, page, size]);
 
   useEffect(() => {
+    let isActive = true;
     const fetchNgos = async () => {
+      setLoading(true);
       try {
         const response = await apiCall(`/directory/ngos?${queryString}`, 'GET');
-        setNgos(Array.isArray(response) ? response : []);
+        if (isActive) {
+          const normalized = Array.isArray(response)
+            ? response
+              .filter((item) => item && typeof item === 'object')
+              .map((item) => ({
+                ...item,
+                ngoName: (item.ngoName || '').toString().trim(),
+                location: (item.location || '').toString().trim(),
+              }))
+              .filter((item) => item.ngoName && item.location)
+            : [];
+          setNgos(normalized);
+        }
       } catch (error) {
         console.error('Error fetching NGOs:', error);
-        setNgos([]);
+        if (isActive) {
+          setNgos([]);
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
     fetchNgos();
+    return () => {
+      isActive = false;
+    };
   }, [queryString]);
 
   return (
@@ -113,36 +135,46 @@ const NgoDirectory = () => {
       ) : (
         <>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {ngos.map((ngo, index) => (
-              <div key={ngo.id ?? `${ngo.ngoName}-${ngo.location}-${index}`} className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 group-hover:scale-110 transition-transform">
-                    <Heart size={32} />
-                  </div>
-                  {ngo.verified && (
-                    <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold ring-1 ring-green-100">
-                      <ShieldCheck size={14} /> REGISTERED
+            {ngos.map((ngo, index) => {
+              const ngoId = ngo.userId || ngo.id;
+              return (
+                <div key={ngo.id ?? `${ngo.ngoName}-${ngo.location}-${index}`} className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 group-hover:scale-110 transition-transform">
+                      <Heart size={32} />
                     </div>
-                  )}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{ngo.ngoName}</h3>
-                <p className="text-pink-600 font-bold text-sm uppercase tracking-wider mb-6">NGO</p>
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3 text-gray-500 font-medium">
-                    <MapPin size={18} className="text-gray-400" />
-                    {ngo.location}
+                    {ngo.verified && (
+                      <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold ring-1 ring-green-100">
+                        <ShieldCheck size={14} /> REGISTERED
+                      </div>
+                    )}
                   </div>
-                  <div className="text-sm text-gray-400 italic">
-                    {ngo.organizationDetails || "Impact-driven organization focused on social justice."}
-                  </div>
-                </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{ngo.ngoName || "Unnamed NGO"}</h3>
+                  <p className="text-pink-600 font-bold text-sm uppercase tracking-wider mb-6">NGO</p>
 
-                <button className="w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-pink-600 hover:text-white transition-all">
-                  View NGO
-                </button>
-              </div>
-            ))}
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-center gap-3 text-gray-500 font-medium">
+                      <MapPin size={18} className="text-gray-400" />
+                      {ngo.location || "—"}
+                    </div>
+                    <div className="text-sm text-gray-400 italic">
+                      {ngo.organizationDetails || "Impact-driven organization focused on social justice."}
+                    </div>
+                  </div>
+
+                  <Link
+                    to={ngoId ? `/ngo/${ngoId}` : "#"}
+                    onClick={(e) => {
+                      if (!ngoId) e.preventDefault();
+                    }}
+                    aria-disabled={!ngoId}
+                    className="block w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-pink-600 hover:text-white transition-all text-center"
+                  >
+                    View NGO
+                  </Link>
+                </div>
+              );
+            })}
             {ngos.length === 0 && (
               <div className="col-span-full text-center py-20 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
                 <p className="text-gray-400 font-medium">No NGOs matched your filters.</p>

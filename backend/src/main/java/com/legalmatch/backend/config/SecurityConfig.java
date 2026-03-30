@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Authenticated users
                 .requestMatchers(HttpMethod.POST, "/api/cases", "/cases").hasRole("CITIZEN")
+                .requestMatchers(HttpMethod.GET, "/api/cases/my", "/cases/my").hasRole("CITIZEN")
                 .requestMatchers("/api/cases/**").authenticated()
                 .requestMatchers("/cases/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()

@@ -76,9 +76,10 @@ public class AuthService {
         // Step 3: Validate BEFORE saving
         if (role == Role.LAWYER) {
             if (request.getSpecialization() == null || request.getSpecialization().isBlank()
-                    || request.getLocation() == null || request.getLocation().isBlank()) {
+                    || request.getLocation() == null || request.getLocation().isBlank()
+                    || request.getLicenseNumber() == null || request.getLicenseNumber().isBlank()) {
 
-                throw new RuntimeException("Specialization and location required for lawyer");
+                throw new RuntimeException("Specialization, location, and license number required for lawyer");
             }
         }
 
@@ -100,6 +101,7 @@ public class AuthService {
             profile.setUser(user);
             profile.setSpecialization(request.getSpecialization());
             profile.setLocation(request.getLocation());
+            profile.setLicenseNumber(request.getLicenseNumber());
             profile.setVerified(false);
 
             lawyerProfileRepository.save(profile);

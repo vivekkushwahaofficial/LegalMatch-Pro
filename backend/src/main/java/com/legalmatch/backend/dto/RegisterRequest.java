@@ -20,6 +20,7 @@ public class RegisterRequest {
 
     private String specialization;
     private String location;
+    private String licenseNumber;
     private String adminInviteCode;
 
     public RegisterRequest() {
@@ -71,6 +72,14 @@ public class RegisterRequest {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getLicenseNumber() {
+        return licenseNumber;
+    }
+
+    public void setLicenseNumber(String licenseNumber) {
+        this.licenseNumber = licenseNumber;
     }
 
     public String getAdminInviteCode() {

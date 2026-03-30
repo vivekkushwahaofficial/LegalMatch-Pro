@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, MapPin, Scale, CheckCircle, ShieldCheck } from 'lucide-react';
 import { apiCall } from '../../api/apiConfig';
 
@@ -26,19 +27,41 @@ const LawyerDirectory = () => {
   }, [expertise, location, verified, sortBy, sortDir, page, size]);
 
   useEffect(() => {
+    let isActive = true;
     const fetchLawyers = async () => {
+      setLoading(true);
       try {
         const response = await apiCall(`/directory/lawyers?${queryString}`, 'GET');
-        setLawyers(Array.isArray(response) ? response : []);
+        if (isActive) {
+          const normalized = Array.isArray(response)
+            ? response
+              .filter((item) => item && typeof item === 'object')
+              .map((item) => ({
+                ...item,
+                name: (item.name || '').toString().trim(),
+                specialization: (item.specialization || '').toString().trim(),
+                location: (item.location || '').toString().trim(),
+              }))
+              .filter((item) => item.name && item.location)
+            : [];
+          setLawyers(normalized);
+        }
 
       } catch (error) {
         console.error('Error fetching lawyers:', error);
-        setLawyers([]);
+        if (isActive) {
+          setLawyers([]);
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
     fetchLawyers();
+    return () => {
+      isActive = false;
+    };
   }, [queryString]);
 
   return (
@@ -53,16 +76,26 @@ const LawyerDirectory = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 w-full lg:max-w-5xl">
           <div className="relative lg:col-span-2">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Filter by expertise..."
+            <select
               className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-100 rounded-3xl focus:border-indigo-500 transition-all outline-none shadow-sm"
               value={expertise}
               onChange={(e) => {
                 setPage(0);
                 setExpertise(e.target.value);
               }}
-            />
+            >
+              <option value="">All specializations</option>
+              <option value="Family Law">Family Law</option>
+              <option value="Criminal Law">Criminal Law</option>
+              <option value="Civil Law">Civil Law</option>
+              <option value="Corporate Law">Corporate Law</option>
+              <option value="Property Law">Property Law</option>
+              <option value="Immigration Law">Immigration Law</option>
+              <option value="Labor Law">Labor Law</option>
+              <option value="Constitutional Law">Constitutional Law</option>
+              <option value="Tax Law">Tax Law</option>
+              <option value="Human Rights Law">Human Rights Law</option>
+            </select>
           </div>
 
           <input
@@ -116,6 +149,7 @@ const LawyerDirectory = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {lawyers.map((lawyer, index) => {
               const key = lawyer.id ?? `${lawyer.name}-${lawyer.specialization}-${lawyer.location}-${index}`;
+              const lawyerId = lawyer.userId || lawyer.id;
               return (
                 <div key={key} className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
                   <div className="flex items-start justify-between mb-6">
@@ -128,22 +162,29 @@ const LawyerDirectory = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{lawyer.name}</h3>
-                  <p className="text-indigo-600 font-bold text-sm uppercase tracking-wider mb-6">{lawyer.specialization}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{lawyer.name || "Unnamed Lawyer"}</h3>
+                  <p className="text-indigo-600 font-bold text-sm uppercase tracking-wider mb-6">{lawyer.specialization || "Lawyer"}</p>
 
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center gap-3 text-gray-500 font-medium">
                       <MapPin size={18} className="text-gray-400" />
-                      {lawyer.location}
+                      {lawyer.location || "—"}
                     </div>
                     <div className="text-sm text-gray-400 italic">
                       {lawyer.organizationDetails || "No additional details available."}
                     </div>
                   </div>
 
-                  <button className="w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-indigo-600 hover:text-white transition-all">
+                  <Link
+                    to={lawyerId ? `/lawyer/${lawyerId}` : "#"}
+                    onClick={(e) => {
+                      if (!lawyerId) e.preventDefault();
+                    }}
+                    aria-disabled={!lawyerId}
+                    className="block w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-indigo-600 hover:text-white transition-all text-center"
+                  >
                     View Profile
-                  </button>
+                  </Link>
                 </div>
               );
             })}

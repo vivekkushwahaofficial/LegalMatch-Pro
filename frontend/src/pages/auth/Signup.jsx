@@ -39,6 +39,12 @@ const schema = yup.object({
     otherwise: (schema) => schema.notRequired(),
   }),
 
+  licenseNumber: yup.string().when("role", {
+    is: "Lawyer",
+    then: (schema) => schema.required("License number is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
   adminInviteCode: yup.string().when("role", {
     is: "Admin",
     then: (schema) => schema.required("Admin invite code is required"),
@@ -67,6 +73,7 @@ function Signup() {
         role: data.role.toUpperCase(),
         specialization: data.specialization || null,
         location: data.location || null,
+        licenseNumber: data.licenseNumber || null,
         adminInviteCode: data.adminInviteCode || null,
       });
 
@@ -194,6 +201,15 @@ function Signup() {
                 <p className="text-red-500 text-sm">
                   {errors.location?.message}
                 </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">License Number</label>
+                <input
+                  {...register("licenseNumber")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+                <p className="text-red-500 text-sm">{errors.licenseNumber?.message}</p>
               </div>
             </>
           )}

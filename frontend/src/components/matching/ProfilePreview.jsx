@@ -1,9 +1,12 @@
 export default function ProfilePreview({ profile }) {
+  const avatarSeed = String(profile?.id || profile?.email || profile?.name || "user").trim();
+  const avatarSrc = profile?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed)}`;
+
   return (
     <div className="bg-white shadow-md rounded-lg p-5 flex items-center gap-4">
 
       <img
-        src="https://i.pravatar.cc/100"
+        src={avatarSrc}
         alt="profile"
         className="w-14 h-14 rounded-full"
       />

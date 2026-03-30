@@ -2,8 +2,10 @@ package com.legalmatch.backend.controller;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -67,7 +69,7 @@ public class DirectoryController {
                 .map(this::mapLawyerDirectory)
                 .collect(Collectors.toList()));
 
-        return paginateAndSortLawyers(mergedList, page, size, sortBy, sortDir);
+        return paginateAndSortLawyers(deduplicateLawyers(mergedList), page, size, sortBy, sortDir);
     }
 
     @GetMapping("/ngos")
@@ -101,7 +103,7 @@ public class DirectoryController {
                 .map(this::mapNgoDirectory)
                 .collect(Collectors.toList()));
 
-        return paginateAndSortNgos(mergedList, page, size, sortBy, sortDir);
+        return paginateAndSortNgos(deduplicateNgos(mergedList), page, size, sortBy, sortDir);
     }
 
     @PostMapping("/import")
@@ -114,7 +116,11 @@ public class DirectoryController {
 
     private LawyerDirectoryResponse mapLawyerProfile(LawyerProfile profile) {
         LawyerDirectoryResponse dto = new LawyerDirectoryResponse();
+        dto.setId(profile.getUser().getId());
+        dto.setType("LAWYER");
+        dto.setSource("PROFILE");
         dto.setName(profile.getUser().getName());
+        dto.setExpertise(profile.getSpecialization());
         dto.setSpecialization(profile.getSpecialization());
         dto.setLocation(profile.getLocation());
         dto.setVerified(profile.isVerified());
@@ -124,7 +130,11 @@ public class DirectoryController {
 
     private LawyerDirectoryResponse mapLawyerDirectory(LawyerDirectory dir) {
         LawyerDirectoryResponse dto = new LawyerDirectoryResponse();
+        dto.setId(dir.getId());
+        dto.setType("LAWYER");
+        dto.setSource("DIRECTORY");
         dto.setName(dir.getName());
+        dto.setExpertise(dir.getExpertise());
         dto.setSpecialization(dir.getExpertise());
         dto.setLocation(dir.getLocation());
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
@@ -134,6 +144,11 @@ public class DirectoryController {
 
     private NgoDirectoryResponse mapNgoProfile(NgoProfile profile) {
         NgoDirectoryResponse dto = new NgoDirectoryResponse();
+        dto.setId(profile.getUser().getId());
+        dto.setType("NGO");
+        dto.setSource("PROFILE");
+        dto.setName(profile.getNgoName());
+        dto.setExpertise(profile.getSpecialization());
         dto.setNgoName(profile.getNgoName());
         dto.setLocation(profile.getLocation());
         dto.setVerified(profile.isVerified());
@@ -143,11 +158,34 @@ public class DirectoryController {
 
     private NgoDirectoryResponse mapNgoDirectory(NgoDirectory dir) {
         NgoDirectoryResponse dto = new NgoDirectoryResponse();
+        dto.setId(dir.getId());
+        dto.setType("NGO");
+        dto.setSource("DIRECTORY");
+        dto.setName(dir.getName());
+        dto.setExpertise(dir.getExpertise());
         dto.setNgoName(dir.getName());
         dto.setLocation(dir.getLocation());
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
         dto.setOrganizationDetails(dir.getOrganizationDetails());
         return dto;
+    }
+
+    private List<LawyerDirectoryResponse> deduplicateLawyers(List<LawyerDirectoryResponse> input) {
+        Map<String, LawyerDirectoryResponse> unique = new LinkedHashMap<>();
+        for (LawyerDirectoryResponse item : input) {
+            String key = safe(item.getName()) + "|" + safe(item.getSpecialization()) + "|" + safe(item.getLocation());
+            unique.putIfAbsent(key, item);
+        }
+        return new ArrayList<>(unique.values());
+    }
+
+    private List<NgoDirectoryResponse> deduplicateNgos(List<NgoDirectoryResponse> input) {
+        Map<String, NgoDirectoryResponse> unique = new LinkedHashMap<>();
+        for (NgoDirectoryResponse item : input) {
+            String key = safe(item.getNgoName()) + "|" + safe(item.getExpertise()) + "|" + safe(item.getLocation());
+            unique.putIfAbsent(key, item);
+        }
+        return new ArrayList<>(unique.values());
     }
 
     private List<LawyerDirectoryResponse> paginateAndSortLawyers(

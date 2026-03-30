@@ -1,35 +1,52 @@
 import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import { apiCall } from "../../api/apiConfig";
 
 export default function Profile() {
+  const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const [user, setUser] = useState({
+    id: "",
     name: "",
     email: "",
     role: "",
     location: "",
     specialization: "",
+    profileImage: "",
     ngoName: "",
     registrationNumber: "",
     licenseNumber: "",
   });
+
+  const avatarSeed = String(user.id || user.email || user.name || "user").trim();
+  const avatarSrc = user.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed)}`;
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         setLoading(true);
         setError("");
-        const profile = await apiCall("/profile/me", "GET");
+        const normalizedId = String(id || "").trim();
+        if (id && (!normalizedId || normalizedId === "undefined" || normalizedId === "null")) {
+          setError("Invalid profile ID");
+          setLoading(false);
+          return;
+        }
+
+        const endpoint = id ? `/ngos/${normalizedId}` : "/profile/me";
+        const profile = await apiCall(endpoint, "GET");
         setUser({
+          id: profile?.id || "",
           name: profile?.name || "",
           email: profile?.email || "",
           role: profile?.role || "",
           location: profile?.location || "",
           specialization: profile?.specialization || "",
+          profileImage: profile?.profileImage || "",
           ngoName: profile?.ngoName || "",
           registrationNumber: profile?.registrationNumber || "",
           licenseNumber: profile?.licenseNumber || "",
@@ -42,7 +59,7 @@ export default function Profile() {
     };
 
     loadProfile();
-  }, []);
+  }, [id]);
 
   const roleUpper = useMemo(() => String(user.role || "").toUpperCase(), [user.role]);
   const isLawyer = roleUpper === "LAWYER";
@@ -72,11 +89,13 @@ export default function Profile() {
       const updated = await apiCall("/profile/update", "PUT", payload);
       setUser((prev) => ({
         ...prev,
+        id: updated?.id || prev.id,
         name: updated?.name || prev.name,
         email: updated?.email || prev.email,
         role: updated?.role || prev.role,
         location: updated?.location || prev.location,
         specialization: updated?.specialization || prev.specialization,
+        profileImage: updated?.profileImage || prev.profileImage,
         ngoName: updated?.ngoName || prev.ngoName,
         registrationNumber: updated?.registrationNumber || prev.registrationNumber,
         licenseNumber: updated?.licenseNumber || prev.licenseNumber,
@@ -109,7 +128,7 @@ export default function Profile() {
       {/* Profile Image */}
       <div className="flex items-center gap-4 mb-6">
         <img
-          src="https://i.pravatar.cc/150"
+          src={avatarSrc}
           alt="profile"
           className="w-20 h-20 rounded-full"
         />
@@ -169,14 +188,25 @@ export default function Profile() {
       {(isLawyer || isNgo) && (
         <div className="mb-4">
           <label className="block text-sm font-medium">Specialization</label>
-          <input
-            type="text"
+          <select
             name="specialization"
             value={user.specialization}
             onChange={handleChange}
             disabled={!isEditing}
             className="w-full border p-2 rounded mt-1"
-          />
+          >
+            <option value="">Select specialization</option>
+            <option value="Family Law">Family Law</option>
+            <option value="Criminal Law">Criminal Law</option>
+            <option value="Civil Law">Civil Law</option>
+            <option value="Corporate Law">Corporate Law</option>
+            <option value="Property Law">Property Law</option>
+            <option value="Immigration Law">Immigration Law</option>
+            <option value="Labor Law">Labor Law</option>
+            <option value="Constitutional Law">Constitutional Law</option>
+            <option value="Tax Law">Tax Law</option>
+            <option value="Human Rights Law">Human Rights Law</option>
+          </select>
         </div>
       )}
 

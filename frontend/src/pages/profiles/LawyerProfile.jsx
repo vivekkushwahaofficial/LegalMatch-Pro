@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { apiCall } from "../../api/apiConfig";
 import { ShieldCheck, MapPin, Scale, Pencil, Save, X } from "lucide-react";
 
 const LawyerProfile = () => {
+  const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -18,8 +20,16 @@ const LawyerProfile = () => {
   });
 
   const fetchProfile = async () => {
+    const normalizedId = String(id || "").trim();
+    if (id && (!normalizedId || normalizedId === "undefined" || normalizedId === "null")) {
+      setError("Invalid profile ID.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const data = await apiCall("/profile/me", "GET");
+      const endpoint = id ? `/lawyers/${normalizedId}` : "/profile/me";
+      const data = await apiCall(endpoint, "GET");
       setProfile(data);
       setForm({
         name: data.name || "",
@@ -36,7 +46,7 @@ const LawyerProfile = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [id]);
 
   const handleSave = async () => {
     setSaving(true);

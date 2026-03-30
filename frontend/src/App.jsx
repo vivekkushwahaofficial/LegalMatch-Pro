@@ -66,19 +66,23 @@ function App() {
         <Route
           path="/admin"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["ADMIN"]}>
               <DashboardLayout role="admin" />
             </PrivateRoute>
           }
         >
           <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="cases" element={<AdminCases />} />
+          <Route path="logs" element={<SystemLogs />} />
+          <Route path="verification" element={<VerificationPage />} />
         </Route>
 
         {/* Lawyer */}
         <Route
           path="/lawyer"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["LAWYER"]}>
               <DashboardLayout role="lawyer" />
             </PrivateRoute>
           }
@@ -96,7 +100,7 @@ function App() {
         <Route
           path="/citizen"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["CITIZEN"]}>
               <DashboardLayout role="citizen" />
             </PrivateRoute>
           }
@@ -117,7 +121,7 @@ function App() {
         <Route
           path="/ngo"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["NGO"]}>
               <DashboardLayout role="ngo" />
             </PrivateRoute>
           }
@@ -129,7 +133,30 @@ function App() {
         </Route>
 
         {/* Other */}
-        <Route path="/lawyer-profile/:id" element={<LawyerProfile />} />
+        <Route
+          path="/lawyer/:id"
+          element={
+            <PrivateRoute allowedRoles={["CITIZEN", "LAWYER", "NGO", "ADMIN"]}>
+              <LawyerProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ngo/:id"
+          element={
+            <PrivateRoute allowedRoles={["CITIZEN", "LAWYER", "NGO", "ADMIN"]}>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lawyer-profile/:id"
+          element={
+            <PrivateRoute allowedRoles={["CITIZEN", "LAWYER", "NGO", "ADMIN"]}>
+              <LawyerProfile />
+            </PrivateRoute>
+          }
+        />
         {/*<Route path="/assigned-cases" element={<AssignedCases />} />
 */}
       </Routes>

@@ -10,6 +10,8 @@ const apiClient = axios.create({
   },
 });
 
+const inFlightGetRequests = new Map();
+
 const clearSessionStorage = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
@@ -123,7 +125,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const apiCall = async (endpoint, method, data = null) => {
+const executeApiCall = async (endpoint, method, data = null) => {
   try {
     const response = await apiClient({
       url: endpoint,
@@ -139,6 +141,28 @@ export const apiCall = async (endpoint, method, data = null) => {
       "API request failed";
     throw new Error(message);
   }
+};
+
+export const apiCall = async (endpoint, method, data = null) => {
+  const normalizedMethod = String(method || "GET").toUpperCase();
+
+  if (normalizedMethod === "GET" && (data === null || data === undefined)) {
+    const key = endpoint;
+    const existingRequest = inFlightGetRequests.get(key);
+    if (existingRequest) {
+      return existingRequest;
+    }
+
+    const requestPromise = executeApiCall(endpoint, normalizedMethod, null)
+      .finally(() => {
+        inFlightGetRequests.delete(key);
+      });
+
+    inFlightGetRequests.set(key, requestPromise);
+    return requestPromise;
+  }
+
+  return executeApiCall(endpoint, normalizedMethod, data);
 };
 
 export { apiClient };
