@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                // WebSocket/SockJS handshake must be open; STOMP CONNECT is validated by JwtChannelInterceptor.
+                .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/directory/**").authenticated()
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
