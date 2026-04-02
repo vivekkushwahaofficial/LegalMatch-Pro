@@ -1,7 +1,3 @@
-# LegalMatch Pro
-
-> AI-inspired legal aid matching platform that connects citizens with verified lawyers and NGOs through role-based workflows, case intelligence, and actionable analytics.
-
 ## 🚀 Project Title & Tagline
 
 **LegalMatch Pro (Legal Aid Matching Platform)** is a full-stack social impact platform built to reduce the gap between people who need legal help and service providers who can offer it.
@@ -328,12 +324,6 @@ Additional validation performed during development:
 - Interactive geospatial map integration for case/provider discovery
 - Event-driven notifications (email, in-app, push)
 - Audit-friendly admin reports and exportable analytics snapshots
-
-## 👨‍💻 Author
-
-- **Name:** Your Name
-- **Role:** Full Stack Developer
-- **GitHub:** https://github.com/your-username
 
 ---
 
