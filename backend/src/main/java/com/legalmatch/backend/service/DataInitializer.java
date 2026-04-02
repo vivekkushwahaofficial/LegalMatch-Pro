@@ -80,14 +80,14 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedUsersAndDirectories() {
         String[][] lawyerData = {
-            {"Adv. Rajesh Sharma", "rajesh@example.com", "Mumbai", "Family Law"},
-            {"Adv. Priya Mehta", "priya@example.com", "Delhi", "Criminal Law"},
-            {"Adv. Suresh Patel", "suresh@example.com", "Bangalore", "Property Law"},
-            {"Adv. Ananya Iyer", "ananya@example.com", "Chennai", "Corporate Law"},
-            {"Adv. Vikram Singh", "vikram@example.com", "Pune", "Civil Law"},
-            {"Adv. Neha Deshmukh", "neha@example.com", "Nanded", "Family Law"},
-            {"Adv. Arjun Kapoor", "arjun@example.com", "Hyderabad", "Criminal Law"},
-            {"Adv. Kavita Roy", "kavita@example.com", "Kolkata", "Consumer Protection"},};
+                { "Adv. Rajesh Sharma", "rajesh@example.com", "Mumbai", "Family Law" },
+                { "Adv. Priya Mehta", "priya@example.com", "Delhi", "Criminal Law" },
+                { "Adv. Suresh Patel", "suresh@example.com", "Bangalore", "Property Law" },
+                { "Adv. Ananya Iyer", "ananya@example.com", "Chennai", "Corporate Law" },
+                { "Adv. Vikram Singh", "vikram@example.com", "Pune", "Civil Law" },
+                { "Adv. Neha Deshmukh", "neha@example.com", "Nanded", "Family Law" },
+                { "Adv. Arjun Kapoor", "arjun@example.com", "Hyderabad", "Criminal Law" },
+                { "Adv. Kavita Roy", "kavita@example.com", "Kolkata", "Consumer Protection" }, };
 
         for (String[] row : lawyerData) {
             // Seed Directory
@@ -121,12 +121,12 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         String[][] ngoData = {
-            {"Legal Aid Foundation", "legalaid@example.com", "Mumbai", "Family Law"},
-            {"Justice For All", "justice@example.com", "Delhi", "Criminal Law"},
-            {"Women's Rights Initiative", "womensrights@example.com", "Bangalore", "Women's Rights"},
-            {"Human Rights Watch", "hrw@example.com", "Chennai", "Human Rights"},
-            {"Rural Legal Aid", "rural@example.com", "Nanded", "Property Law"},
-            {"Anti-Corruption NGO", "antic@example.com", "Hyderabad", "Anti-Corruption"},};
+                { "Legal Aid Foundation", "legalaid@example.com", "Mumbai", "Family Law" },
+                { "Justice For All", "justice@example.com", "Delhi", "Criminal Law" },
+                { "Women's Rights Initiative", "womensrights@example.com", "Bangalore", "Women's Rights" },
+                { "Human Rights Watch", "hrw@example.com", "Chennai", "Human Rights" },
+                { "Rural Legal Aid", "rural@example.com", "Nanded", "Property Law" },
+                { "Anti-Corruption NGO", "antic@example.com", "Hyderabad", "Anti-Corruption" }, };
 
         for (String[] row : ngoData) {
             // Seed Directory

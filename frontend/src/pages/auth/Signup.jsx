@@ -3,6 +3,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../../api/apiConfig";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const schema = yup.object({
   name: yup.string().required("Name is required"),
@@ -64,6 +66,10 @@ function Signup() {
     resolver: yupResolver(schema),
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showAdminInviteCode, setShowAdminInviteCode] = useState(false);
+
   const onSubmit = async (data) => {
     try {
       await apiClient.post("/auth/register", {
@@ -118,23 +124,41 @@ function Signup() {
           {/* Password */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Password</label>
-            <input
-              {...register("password")}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-            <p className="text-red-500 text-sm">{errors.password?.message}</p>
+            <div className="relative">
+              <input
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <p className="text-red-500 text-sm mt-1">{errors.password?.message}</p>
           </div>
 
           {/* Confirm Password */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Confirm Password</label>
-            <input
-              {...register("confirmPassword")}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-            <p className="text-red-500 text-sm">
+            <div className="relative">
+              <input
+                {...register("confirmPassword")}
+                type={showConfirmPassword ? "text" : "password"}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <p className="text-red-500 text-sm mt-1">
               {errors.confirmPassword?.message}
             </p>
           </div>
@@ -217,12 +241,21 @@ function Signup() {
           {watch("role") === "Admin" && (
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Admin Invite Code</label>
-              <input
-                {...register("adminInviteCode")}
-                type="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-              <p className="text-red-500 text-sm">{errors.adminInviteCode?.message}</p>
+              <div className="relative">
+                <input
+                  {...register("adminInviteCode")}
+                  type={showAdminInviteCode ? "text" : "password"}
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAdminInviteCode((prev) => !prev)}
+                  className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showAdminInviteCode ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <p className="text-red-500 text-sm mt-1">{errors.adminInviteCode?.message}</p>
             </div>
           )}
 
