@@ -16,7 +16,9 @@ import com.legalmatch.backend.entity.Role;
 import com.legalmatch.backend.entity.User;
 import com.legalmatch.backend.entity.VerificationStatus;
 import com.legalmatch.backend.repository.CaseRepository;
+import com.legalmatch.backend.repository.LawyerProfileRepository;
 import com.legalmatch.backend.repository.MatchRepository;
+import com.legalmatch.backend.repository.NgoProfileRepository;
 import com.legalmatch.backend.repository.UserRepository;
 
 @Service
@@ -25,20 +27,26 @@ public class AnalyticsService {
     private final UserRepository userRepository;
     private final CaseRepository caseRepository;
     private final MatchRepository matchRepository;
+    private final LawyerProfileRepository lawyerProfileRepository;
+    private final NgoProfileRepository ngoProfileRepository;
 
     public AnalyticsService(UserRepository userRepository,
             CaseRepository caseRepository,
-            MatchRepository matchRepository) {
+            MatchRepository matchRepository,
+            LawyerProfileRepository lawyerProfileRepository,
+            NgoProfileRepository ngoProfileRepository) {
         this.userRepository = userRepository;
         this.caseRepository = caseRepository;
         this.matchRepository = matchRepository;
+        this.lawyerProfileRepository = lawyerProfileRepository;
+        this.ngoProfileRepository = ngoProfileRepository;
     }
 
     public Map<String, Object> getOverview() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("totalUsers", userRepository.count());
-        response.put("totalLawyers", userRepository.countByRole(Role.LAWYER));
-        response.put("totalNgos", userRepository.countByRole(Role.NGO));
+        response.put("totalLawyers", lawyerProfileRepository.count());
+        response.put("totalNgos", ngoProfileRepository.count());
         response.put("totalCitizens", userRepository.countByRole(Role.CITIZEN));
         response.put("pendingVerifications", userRepository.countByStatus(VerificationStatus.PENDING));
         response.put("approvedVerifications", userRepository.countByStatus(VerificationStatus.APPROVED));

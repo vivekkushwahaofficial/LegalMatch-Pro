@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, ShieldCheck, Briefcase, ScrollText, BarChart3, PieChart as PieChartIcon, MapPinned } from "lucide-react";
+import { Users, ShieldCheck, Briefcase, ScrollText, BarChart3, PieChart as PieChartIcon, MapPinned, Building2 } from "lucide-react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -85,22 +85,15 @@ const AdminDashboard = () => {
     return Object.keys(byStatus).map((status) => ({ status, count: Number(byStatus[status] || 0) }));
   }, [matchMetrics]);
 
-  const staticTopLocations = [
-    { location: "New Delhi", count: 10 },
-    { location: "Mumbai", count: 3 },
-    { location: "Bengaluru", count: 1 },
-    { location: "Hyderabad", count: 1 },
-    { location: "Chennai", count: 1 },
-  ];
-
   const geoData = useMemo(() => {
-    const apiData = Array.isArray(overview.geoCaseDistribution) ? overview.geoCaseDistribution : [];
-    return apiData.length ? apiData : staticTopLocations;
+    return Array.isArray(overview.geoCaseDistribution) ? overview.geoCaseDistribution : [];
   }, [overview]);
 
   const kpiCards = [
     { label: "Total Users", value: Number(overview.totalUsers || 0), icon: Users },
-    { label: "Total Cases", value: Number(overview.totalCases || 0), icon: Briefcase },
+    { label: "Total Lawyers", value: Number(overview.totalLawyers || 0), icon: Briefcase },
+    { label: "Total NGOs", value: Number(overview.totalNgos || 0), icon: Building2 },
+    { label: "Total Cases", value: Number(overview.totalCases || 0), icon: ScrollText },
     { label: "Total Matches", value: Number(overview.totalMatches || 0), icon: BarChart3 },
     { label: "Resolved Cases", value: Number(overview.resolvedCases || 0), icon: ShieldCheck },
   ];
@@ -148,7 +141,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
         {kpiCards.map((item) => (
           <div key={item.label} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between">
