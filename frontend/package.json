@@ -20,6 +20,8 @@
     "react-hook-form": "^7.48.0",
     "react-router-dom": "^7.13.1",
     "recharts": "^2.15.1",
+    "react-leaflet": "^4.2.1",
+    "leaflet": "^1.9.4",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
     "yup": "^1.3.2"

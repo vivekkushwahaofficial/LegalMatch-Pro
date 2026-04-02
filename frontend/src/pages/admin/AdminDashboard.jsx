@@ -16,6 +16,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
+import GeoDistributionMap from "../../components/dashboard/GeoDistributionMap";
 import { apiCall } from "../../api/apiConfig";
 
 const AdminDashboard = () => {
@@ -84,8 +85,17 @@ const AdminDashboard = () => {
     return Object.keys(byStatus).map((status) => ({ status, count: Number(byStatus[status] || 0) }));
   }, [matchMetrics]);
 
+  const staticTopLocations = [
+    { location: "New Delhi", count: 10 },
+    { location: "Mumbai", count: 3 },
+    { location: "Bengaluru", count: 1 },
+    { location: "Hyderabad", count: 1 },
+    { location: "Chennai", count: 1 },
+  ];
+
   const geoData = useMemo(() => {
-    return Array.isArray(overview.geoCaseDistribution) ? overview.geoCaseDistribution : [];
+    const apiData = Array.isArray(overview.geoCaseDistribution) ? overview.geoCaseDistribution : [];
+    return apiData.length ? apiData : staticTopLocations;
   }, [overview]);
 
   const kpiCards = [
@@ -151,6 +161,26 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {cards.map((card) => (
+          <Link
+            key={card.path}
+            to={card.path}
+            className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                <card.icon size={20} />
+              </div>
+              <div>
+                <h2 className="font-semibold text-slate-900">{card.title}</h2>
+                <p className="text-sm text-slate-500 mt-1">{card.description}</p>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
 
@@ -234,9 +264,8 @@ const AdminDashboard = () => {
           <h2 className="font-semibold text-slate-900">Geographic Distribution (Map View)</h2>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 h-56 rounded-xl border border-slate-200 bg-gradient-to-br from-sky-100 via-slate-50 to-cyan-100 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #93C5FD 2px, transparent 2px), radial-gradient(circle at 60% 40%, #60A5FA 3px, transparent 3px), radial-gradient(circle at 80% 70%, #2563EB 4px, transparent 4px)" }} />
-            <div className="absolute bottom-3 left-3 text-xs text-slate-600 bg-white/80 px-2 py-1 rounded-md border border-slate-200">Interactive map integration ready</div>
+            <div className="lg:col-span-2">
+            <GeoDistributionMap />
           </div>
           <div className="rounded-xl border border-slate-200 p-3 bg-slate-50">
             <h3 className="text-sm font-semibold text-slate-800 mb-2">Top Case Locations</h3>
@@ -254,26 +283,6 @@ const AdminDashboard = () => {
             </ul>
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {cards.map((card) => (
-          <Link
-            key={card.path}
-            to={card.path}
-            className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                <card.icon size={20} />
-              </div>
-              <div>
-                <h2 className="font-semibold text-slate-900">{card.title}</h2>
-                <p className="text-sm text-slate-500 mt-1">{card.description}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
       </div>
     </div>
   );

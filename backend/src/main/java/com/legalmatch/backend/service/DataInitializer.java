@@ -43,6 +43,8 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         log.info("DataInitializer started.");
 
+        ensureAdminUser();
+
         boolean missingProviders = userRepo.countByRole(Role.LAWYER) == 0 || userRepo.countByRole(Role.NGO) == 0;
         if (lawyerDirRepo.count() == 0 || userRepo.count() < 5 || missingProviders) {
             log.info("Directories/Users are empty. Seeding full sample data...");
@@ -50,6 +52,30 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         log.info("DataInitializer finished.");
+    }
+
+    private void ensureAdminUser() {
+        String adminEmail = "admin@test.com";
+        User admin;
+        if (userRepo.findByEmail(adminEmail).isPresent()) {
+            admin = userRepo.findByEmail(adminEmail).get();
+            admin.setRole(Role.ADMIN);
+            admin.setStatus(VerificationStatus.APPROVED);
+            admin.setPassword(passwordEncoder.encode("Admin@123"));
+            admin.setSubmittedDate(LocalDateTime.now());
+            userRepo.save(admin);
+            log.info("Updated existing admin user: {}", adminEmail);
+        } else {
+            admin = new User();
+            admin.setName("Administrator");
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode("Admin@123"));
+            admin.setRole(Role.ADMIN);
+            admin.setStatus(VerificationStatus.APPROVED);
+            admin.setSubmittedDate(LocalDateTime.now());
+            userRepo.save(admin);
+            log.info("Seeded admin user: {}", adminEmail);
+        }
     }
 
     private void seedUsersAndDirectories() {

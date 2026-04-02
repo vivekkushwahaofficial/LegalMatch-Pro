@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Eye, EyeOff } from "lucide-react";
-import { apiClient } from "../../api/apiConfig";
 
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -27,28 +26,51 @@ function Signin() {
     resolver: yupResolver(schema),
   });
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
   // Runs when user clicks Sign In
   const onSubmit = async (data) => {
     try {
-      const response = await apiClient.post("/auth/login", {
-        email: data.email,
-        password: data.password,
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
       });
 
-      const result = response.data;
-      console.log("Login API Response:", result);
+      const text = await response.text();
+      let result = {};
+      try {
+        result = text ? JSON.parse(text) : {};
+      } catch (_) {
+        result = { message: text };
+      }
+
+      if (!response.ok) {
+        const message = result?.message || result?.error || response.statusText || "Login failed";
+        alert(message);
+        return;
+      }
+
+      if (!result?.accessToken) {
+        alert(result?.message || "Login failed");
+        return;
+      }
 
       // Save token using AuthContext
       login(result.accessToken);
-
       localStorage.setItem("refreshToken", result.refreshToken);
       localStorage.setItem("userName", result.name);
-      if (result.role) localStorage.setItem("role", result.role);
+      if (result.role) {
+        localStorage.setItem("role", result.role);
+        localStorage.setItem("userRole", result.role);
+      }
       if (result.userId) localStorage.setItem("userId", String(result.userId));
 
-      alert("Login successful!");
-
-      // Redirect based on role
       if (result.role === "ADMIN") {
         navigate("/admin");
       } else if (result.role === "LAWYER") {
@@ -61,7 +83,8 @@ function Signin() {
 
     } catch (error) {
       console.error("Login error:", error);
-      alert(error?.response?.data?.message || error?.message || "Login failed. Please try again.");
+      const message = error?.message || "Login failed. Please try again.";
+      alert(message);
     }
   };
 
