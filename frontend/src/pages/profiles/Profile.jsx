@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiCall } from "../../api/apiConfig";
+import InitialsAvatar from "../../components/shared/InitialsAvatar";
 
 export default function Profile() {
   const { id } = useParams();
@@ -22,8 +23,7 @@ export default function Profile() {
     licenseNumber: "",
   });
 
-  const avatarSeed = String(user.id || user.email || user.name || "user").trim();
-  const avatarSrc = user.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed)}`;
+  const isReadonlyView = Boolean(id);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -127,14 +127,16 @@ export default function Profile() {
 
       {/* Profile Image */}
       <div className="flex items-center gap-4 mb-6">
-        <img
-          src={avatarSrc}
-          alt="profile"
-          className="w-20 h-20 rounded-full"
-        />
-        <button className="px-3 py-1 bg-gray-200 rounded">
-          Change Photo
-        </button>
+        {user.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt="profile"
+            className="w-20 h-20 rounded-full object-cover"
+          />
+        ) : (
+          <InitialsAvatar name={user.name || user.email} size={80} className="bg-slate-200 text-slate-700" textClassName="text-lg" />
+        )}
+        {!isReadonlyView && <button className="px-3 py-1 bg-gray-200 rounded">Change Photo</button>}
       </div>
 
       {/* Name */}
@@ -274,9 +276,10 @@ export default function Profile() {
         ) : (
           <button
             onClick={() => setIsEditing(true)}
+            disabled={isReadonlyView}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Edit Profile
+            {isReadonlyView ? "Read Only" : "Edit Profile"}
           </button>
         )}
       </div>

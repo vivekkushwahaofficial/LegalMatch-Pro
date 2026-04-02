@@ -1,15 +1,23 @@
-export default function ProfilePreview({ profile }) {
-  const avatarSeed = String(profile?.id || profile?.email || profile?.name || "user").trim();
-  const avatarSrc = profile?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed)}`;
+import InitialsAvatar from "../shared/InitialsAvatar";
 
+export default function ProfilePreview({ profile }) {
   return (
     <div className="bg-white shadow-md rounded-lg p-5 flex items-center gap-4">
 
-      <img
-        src={avatarSrc}
-        alt="profile"
-        className="w-14 h-14 rounded-full"
-      />
+      {profile?.profileImage ? (
+        <img
+          src={profile.profileImage}
+          alt="profile"
+          className="w-14 h-14 rounded-full object-cover"
+        />
+      ) : (
+        <InitialsAvatar
+          name={profile?.name}
+          size={56}
+          className="bg-slate-200 text-slate-700"
+          textClassName="text-sm"
+        />
+      )}
 
       <div className="flex-1">
         <h3 className="font-semibold text-lg">

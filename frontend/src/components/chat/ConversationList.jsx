@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Search, MoreVertical, MessageSquare } from "lucide-react";
+import InitialsAvatar from "../shared/InitialsAvatar";
 
 const ConversationList = ({ conversations, onSelectChat, selectedMatch }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filtered = (conversations || []).filter(c => 
+  const filtered = (conversations || []).filter(c =>
     (c.providerName || c.matchedUserName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -44,22 +45,22 @@ const ConversationList = ({ conversations, onSelectChat, selectedMatch }) => {
           filtered.map((c) => {
             const isSelected = selectedMatch && (selectedMatch.id === c.id || selectedMatch.matchId === c.matchId);
             const name = c.providerName || c.matchedUserName;
-            
+
             return (
               <div
                 key={c.id || c.matchId}
                 onClick={() => onSelectChat(c)}
-                className={`flex items-center gap-4 p-4 mx-3 my-1 cursor-pointer rounded-2xl transition-all duration-200 ${
-                  isSelected 
-                  ? "bg-blue-50 shadow-sm" 
-                  : "hover:bg-gray-50"
-                }`}
+                className={`flex items-center gap-4 p-4 mx-3 my-1 cursor-pointer rounded-2xl transition-all duration-200 ${isSelected
+                    ? "bg-blue-50 shadow-sm"
+                    : "hover:bg-gray-50"
+                  }`}
               >
                 <div className="relative">
-                  <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`}
-                    className="w-12 h-12 rounded-full border border-gray-100 shadow-sm p-0.5"
-                    alt={name}
+                  <InitialsAvatar
+                    name={name}
+                    size={48}
+                    className="border border-gray-100 shadow-sm bg-slate-100 text-slate-700"
+                    textClassName="text-xs"
                   />
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                 </div>
@@ -76,7 +77,7 @@ const ConversationList = ({ conversations, onSelectChat, selectedMatch }) => {
                       {c.matchScore || c.score}% match
                     </span>
                     <p className={`text-xs truncate ${isSelected ? "text-blue-600/70" : "text-gray-500"} font-medium`}>
-                       discussing case...
+                      discussing case...
                     </p>
                   </div>
                 </div>

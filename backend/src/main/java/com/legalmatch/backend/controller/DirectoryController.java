@@ -63,8 +63,8 @@ public class DirectoryController {
 
         List<LawyerDirectory> directoryLawyers = directoryService.getAllDirectoryLawyers();
         mergedList.addAll(directoryLawyers.stream()
-                .filter(l -> (normalizedSpecialization == null || l.getExpertise().equalsIgnoreCase(normalizedSpecialization))
-                && (normalizedLocation == null || l.getLocation().equalsIgnoreCase(normalizedLocation))
+                .filter(l -> (normalizedSpecialization == null || (l.getExpertise() != null && l.getExpertise().equalsIgnoreCase(normalizedSpecialization)))
+                && (normalizedLocation == null || (l.getLocation() != null && l.getLocation().equalsIgnoreCase(normalizedLocation)))
                 && (verified == null || (l.getVerified() != null && l.getVerified().equals(verified))))
                 .map(this::mapLawyerDirectory)
                 .collect(Collectors.toList()));
@@ -98,7 +98,7 @@ public class DirectoryController {
         List<NgoDirectory> directoryNgos = directoryService.getAllDirectoryNgos();
         mergedList.addAll(directoryNgos.stream()
                 .filter(n -> (normalizedExpertise == null || (n.getExpertise() != null && n.getExpertise().equalsIgnoreCase(normalizedExpertise)))
-                && (normalizedLocation == null || n.getLocation().equalsIgnoreCase(normalizedLocation))
+                && (normalizedLocation == null || (n.getLocation() != null && n.getLocation().equalsIgnoreCase(normalizedLocation)))
                 && (verified == null || (n.getVerified() != null && n.getVerified().equals(verified))))
                 .map(this::mapNgoDirectory)
                 .collect(Collectors.toList()));
@@ -119,10 +119,10 @@ public class DirectoryController {
         dto.setId(profile.getUser().getId());
         dto.setType("LAWYER");
         dto.setSource("PROFILE");
-        dto.setName(profile.getUser().getName());
-        dto.setExpertise(profile.getSpecialization());
-        dto.setSpecialization(profile.getSpecialization());
-        dto.setLocation(profile.getLocation());
+        dto.setName(defaultText(profile.getUser().getName(), "Unknown"));
+        dto.setExpertise(defaultText(profile.getSpecialization(), "Not Provided"));
+        dto.setSpecialization(defaultText(profile.getSpecialization(), "Not Provided"));
+        dto.setLocation(defaultText(profile.getLocation(), "Not Provided"));
         dto.setVerified(profile.isVerified());
         dto.setOrganizationDetails("Registered Member");
         return dto;
@@ -133,12 +133,12 @@ public class DirectoryController {
         dto.setId(dir.getId());
         dto.setType("LAWYER");
         dto.setSource("DIRECTORY");
-        dto.setName(dir.getName());
-        dto.setExpertise(dir.getExpertise());
-        dto.setSpecialization(dir.getExpertise());
-        dto.setLocation(dir.getLocation());
+        dto.setName(defaultText(dir.getName(), "Unknown"));
+        dto.setExpertise(defaultText(dir.getExpertise(), "Not Provided"));
+        dto.setSpecialization(defaultText(dir.getExpertise(), "Not Provided"));
+        dto.setLocation(defaultText(dir.getLocation(), "Not Provided"));
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
-        dto.setOrganizationDetails(dir.getOrganizationDetails());
+        dto.setOrganizationDetails(defaultText(dir.getOrganizationDetails(), "Directory listing"));
         return dto;
     }
 
@@ -147,10 +147,10 @@ public class DirectoryController {
         dto.setId(profile.getUser().getId());
         dto.setType("NGO");
         dto.setSource("PROFILE");
-        dto.setName(profile.getNgoName());
-        dto.setExpertise(profile.getSpecialization());
-        dto.setNgoName(profile.getNgoName());
-        dto.setLocation(profile.getLocation());
+        dto.setName(defaultText(profile.getNgoName(), "Unknown"));
+        dto.setExpertise(defaultText(profile.getSpecialization(), "Not Provided"));
+        dto.setNgoName(defaultText(profile.getNgoName(), "Unknown"));
+        dto.setLocation(defaultText(profile.getLocation(), "Not Provided"));
         dto.setVerified(profile.isVerified());
         dto.setOrganizationDetails("Registered Member");
         return dto;
@@ -161,12 +161,12 @@ public class DirectoryController {
         dto.setId(dir.getId());
         dto.setType("NGO");
         dto.setSource("DIRECTORY");
-        dto.setName(dir.getName());
-        dto.setExpertise(dir.getExpertise());
-        dto.setNgoName(dir.getName());
-        dto.setLocation(dir.getLocation());
+        dto.setName(defaultText(dir.getName(), "Unknown"));
+        dto.setExpertise(defaultText(dir.getExpertise(), "Not Provided"));
+        dto.setNgoName(defaultText(dir.getName(), "Unknown"));
+        dto.setLocation(defaultText(dir.getLocation(), "Not Provided"));
         dto.setVerified(dir.getVerified() != null && dir.getVerified());
-        dto.setOrganizationDetails(dir.getOrganizationDetails());
+        dto.setOrganizationDetails(defaultText(dir.getOrganizationDetails(), "Directory listing"));
         return dto;
     }
 
@@ -273,5 +273,12 @@ public class DirectoryController {
         }
 
         return normalized;
+    }
+
+    private String defaultText(String value, String fallback) {
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
+        return value.trim();
     }
 }

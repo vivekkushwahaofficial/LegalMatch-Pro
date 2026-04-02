@@ -3,6 +3,7 @@ package com.legalmatch.backend.service;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -102,22 +103,30 @@ public class DirectoryService {
 
             if (externalLawyers != null) {
                 for (ExternalLawyerDto dto : externalLawyers) {
-                    if (!hasText(dto.getName()) || !hasText(dto.getCity())) {
+                    if (dto == null) {
                         continue;
                     }
-                    String normalizedLocation = dto.getCity().trim().toUpperCase();
-                    if (!lawyerDirectoryRepository.existsByNameAndLocation(dto.getName().trim(), normalizedLocation)) {
+
+                    if (isCriticallyEmpty(dto.getName(), dto.getCity())) {
+                        continue;
+                    }
+
+                    String safeName = defaultText(dto.getName(), "Unknown");
+                    String safeLocation = defaultText(dto.getCity(), "Not Provided").toUpperCase();
+                    String safeExpertise = defaultText(dto.getPracticeArea(), "Not Provided");
+
+                    if (!lawyerDirectoryRepository.existsByNameAndLocation(safeName, safeLocation)) {
                         LawyerDirectory lawyer = new LawyerDirectory();
-                        lawyer.setName(dto.getName().trim());
-                        lawyer.setExpertise(dto.getPracticeArea());
-                        lawyer.setLocation(normalizedLocation);
+                        lawyer.setName(safeName);
+                        lawyer.setExpertise(safeExpertise);
+                        lawyer.setLocation(safeLocation);
                         lawyer.setVerified("Verified".equalsIgnoreCase(dto.getVerificationStatus()));
                         lawyer.setOrganizationDetails("Imported from External API");
                         lawyerDirectoryRepository.save(lawyer);
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.warn("Failed to import lawyers from external API: {}", e.getMessage());
         }
     }
@@ -126,30 +135,34 @@ public class DirectoryService {
         try {
             List<ExternalNgoDto> externalNgos = readNgosFromExcel("ngo_data.xlsx");
             for (ExternalNgoDto dto : externalNgos) {
-                if (!hasText(dto.getOrg_name()) || !hasText(dto.getCity())) {
+                if (dto == null || isCriticallyEmpty(dto.getOrg_name(), dto.getCity())) {
                     continue;
                 }
-                String normalizedLocation = dto.getCity().trim().toUpperCase();
-                if (!ngoDirectoryRepository.existsByNameAndLocation(dto.getOrg_name().trim(), normalizedLocation)) {
+
+                String safeName = defaultText(dto.getOrg_name(), "Unknown");
+                String safeLocation = defaultText(dto.getCity(), "Not Provided").toUpperCase();
+                String safeExpertise = defaultText(dto.getFocus_area(), "Not Provided");
+
+                if (!ngoDirectoryRepository.existsByNameAndLocation(safeName, safeLocation)) {
                     NgoDirectory ngo = new NgoDirectory();
-                    ngo.setName(dto.getOrg_name().trim());
-                    ngo.setExpertise(dto.getFocus_area());
-                    ngo.setLocation(normalizedLocation);
+                    ngo.setName(safeName);
+                    ngo.setExpertise(safeExpertise);
+                    ngo.setLocation(safeLocation);
                     ngo.setVerified("Registered".equalsIgnoreCase(dto.getRegistration_status()));
                     ngo.setOrganizationDetails("Imported from Excel");
                     ngoDirectoryRepository.save(ngo);
                 }
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException | RuntimeException e) {
             log.warn("Failed to import NGOs from Excel: {}", e.getMessage());
         }
     }
 
-    private List<ExternalNgoDto> readNgosFromExcel(String fileName) throws Exception {
+    private List<ExternalNgoDto> readNgosFromExcel(String fileName) throws java.io.IOException {
         List<ExternalNgoDto> list = new ArrayList<>();
-        ClassPathResource resource = new ClassPathResource(fileName);
+        ClassPathResource resource = new ClassPathResource(Objects.requireNonNull(fileName, "fileName is required"));
         if (!resource.exists()) {
-            throw new Exception("File not found: " + fileName);
+            throw new java.io.IOException("File not found: " + fileName);
         }
 
         try (InputStream is = resource.getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
@@ -173,16 +186,16 @@ public class DirectoryService {
         if (cell == null) {
             return "";
         }
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf((int) cell.getNumericCellValue());
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            default:
-                return "";
-        }
+        return switch (cell.getCellType()) {
+            case STRING ->
+                cell.getStringCellValue();
+            case NUMERIC ->
+                String.valueOf((int) cell.getNumericCellValue());
+            case BOOLEAN ->
+                String.valueOf(cell.getBooleanCellValue());
+            default ->
+                "";
+        };
     }
 
     private List<LawyerProfile> filterLawyersByVerified(List<LawyerProfile> list, Boolean verified) {
@@ -201,5 +214,16 @@ public class DirectoryService {
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    private boolean isCriticallyEmpty(String name, String location) {
+        return !hasText(name) && !hasText(location);
+    }
+
+    private String defaultText(String value, String fallback) {
+        if (!hasText(value)) {
+            return fallback;
+        }
+        return value.trim();
     }
 }

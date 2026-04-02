@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, MapPin, Heart, ShieldCheck } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { apiCall } from '../../api/apiConfig';
+import DirectoryCard from '../../components/shared/DirectoryCard';
+import FilterPanel from '../../components/shared/FilterPanel';
+import EmptyState from '../../components/shared/EmptyState';
+import ErrorState from '../../components/shared/ErrorState';
 
 const NgoDirectory = () => {
   const [ngos, setNgos] = useState([]);
@@ -13,23 +16,36 @@ const NgoDirectory = () => {
   const [sortDir, setSortDir] = useState('asc');
   const [page, setPage] = useState(0);
   const [size] = useState(12);
+  const [error, setError] = useState('');
+  const [debouncedExpertise, setDebouncedExpertise] = useState('');
+  const [debouncedLocation, setDebouncedLocation] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedExpertise(expertise.trim());
+      setDebouncedLocation(location.trim());
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [expertise, location]);
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
-    if (expertise.trim()) params.set('expertise', expertise.trim());
-    if (location.trim()) params.set('location', location.trim());
+    if (debouncedExpertise) params.set('expertise', debouncedExpertise);
+    if (debouncedLocation) params.set('location', debouncedLocation);
     if (verified !== '') params.set('verified', verified);
     params.set('sortBy', sortBy);
     params.set('sortDir', sortDir);
     params.set('page', String(page));
     params.set('size', String(size));
     return params.toString();
-  }, [expertise, location, verified, sortBy, sortDir, page, size]);
+  }, [debouncedExpertise, debouncedLocation, verified, sortBy, sortDir, page, size]);
 
   useEffect(() => {
     let isActive = true;
     const fetchNgos = async () => {
       setLoading(true);
+      setError('');
       try {
         const response = await apiCall(`/directory/ngos?${queryString}`, 'GET');
         if (isActive) {
@@ -49,6 +65,7 @@ const NgoDirectory = () => {
         console.error('Error fetching NGOs:', error);
         if (isActive) {
           setNgos([]);
+          setError('Unable to load NGO directory right now.');
         }
       } finally {
         if (isActive) {
@@ -71,7 +88,7 @@ const NgoDirectory = () => {
         </div>
 
         {/* Filters + sorting + pagination controls aligned with lawyer directory UX. */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 w-full lg:max-w-5xl">
+        <FilterPanel>
           <div className="relative lg:col-span-2">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -125,8 +142,10 @@ const NgoDirectory = () => {
             <option value="location:asc">Location A-Z</option>
             <option value="verified:desc">Verified First</option>
           </select>
-        </div>
+        </FilterPanel>
       </div>
+
+      {error && <ErrorState message={error} className="mb-6" />}
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -137,48 +156,23 @@ const NgoDirectory = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {ngos.map((ngo, index) => {
               const ngoId = ngo.userId || ngo.id;
+              const profileUrl = ngoId ? `/ngo/${ngoId}` : null;
               return (
-                <div key={ngo.id ?? `${ngo.ngoName}-${ngo.location}-${index}`} className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 group-hover:scale-110 transition-transform">
-                      <Heart size={32} />
-                    </div>
-                    {ngo.verified && (
-                      <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold ring-1 ring-green-100">
-                        <ShieldCheck size={14} /> REGISTERED
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{ngo.ngoName || "Unnamed NGO"}</h3>
-                  <p className="text-pink-600 font-bold text-sm uppercase tracking-wider mb-6">NGO</p>
-
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center gap-3 text-gray-500 font-medium">
-                      <MapPin size={18} className="text-gray-400" />
-                      {ngo.location || "—"}
-                    </div>
-                    <div className="text-sm text-gray-400 italic">
-                      {ngo.organizationDetails || "Impact-driven organization focused on social justice."}
-                    </div>
-                  </div>
-
-                  <Link
-                    to={ngoId ? `/ngo/${ngoId}` : "#"}
-                    onClick={(e) => {
-                      if (!ngoId) e.preventDefault();
-                    }}
-                    aria-disabled={!ngoId}
-                    className="block w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-pink-600 hover:text-white transition-all text-center"
-                  >
-                    View NGO
-                  </Link>
-                </div>
+                <DirectoryCard
+                  key={ngo.id ?? `${ngo.ngoName}-${ngo.location}-${index}`}
+                  title={ngo.ngoName || ngo.name || 'Unnamed NGO'}
+                  subtitle={ngo.expertise || 'NGO'}
+                  location={ngo.location}
+                  details={ngo.organizationDetails || 'Impact-driven organization focused on social justice.'}
+                  verified={ngo.verified}
+                  profileUrl={profileUrl}
+                  ctaLabel="View NGO"
+                  accent="pink"
+                />
               );
             })}
             {ngos.length === 0 && (
-              <div className="col-span-full text-center py-20 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
-                <p className="text-gray-400 font-medium">No NGOs matched your filters.</p>
-              </div>
+              <EmptyState title="No NGOs found" message="No NGOs matched your filters." />
             )}
           </div>
 

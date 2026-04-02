@@ -46,6 +46,8 @@ export default function Matching() {
 
       const mappedProfiles = rows.map((m) => ({
         id: m.matchId,
+        providerId: m.providerId || m.matchedUserId,
+        providerType: m.providerType || m.matchedUserRole,
         name: m.matchedUserName,
         role: m.matchedUserRole,
         specialization: m.specialization,

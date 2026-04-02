@@ -27,6 +27,8 @@ public class LawyerDirectory {
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "Expertise is required")
+    @Column(nullable = false)
     private String expertise;
 
     @NotBlank(message = "Location is required")
@@ -44,6 +46,7 @@ public class LawyerDirectory {
 
     @PrePersist
     @PreUpdate
+    @SuppressWarnings("unused")
     private void normalizeAndValidate() {
         name = name == null ? null : name.trim();
         location = location == null ? null : location.trim();

@@ -26,4 +26,6 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     Optional<Match> findByMatchIdAndMatchedUser(Long matchId, User matchedUser);
 
     long countByMatchedUserAndMatchStatusIn(User matchedUser, Collection<String> statuses);
+
+    long countByMatchStatusIgnoreCase(String matchStatus);
 }

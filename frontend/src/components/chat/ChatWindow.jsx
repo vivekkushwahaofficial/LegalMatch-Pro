@@ -3,6 +3,7 @@ import { apiCall, getValidAccessToken } from "../../api/apiConfig";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import { MessageCircle, Send, MoreHorizontal, Info } from "lucide-react";
+import InitialsAvatar from "../shared/InitialsAvatar";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
@@ -118,10 +119,11 @@ const ChatWindow = ({ match }) => {
       <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <img
-              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${match.providerName || match.matchedUserName}`}
-              className="w-10 h-10 rounded-full border border-gray-100 p-0.5"
-              alt="avatar"
+            <InitialsAvatar
+              name={match.providerName || match.matchedUserName}
+              size={40}
+              className="border border-gray-100 bg-slate-100 text-slate-700"
+              textClassName="text-xs"
             />
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
           </div>

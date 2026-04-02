@@ -18,6 +18,7 @@ const LawyerProfile = () => {
     location: "",
     licenseNumber: "",
   });
+  const isReadonlyView = Boolean(id);
 
   const fetchProfile = async () => {
     const normalizedId = String(id || "").trim();
@@ -108,7 +109,7 @@ const LawyerProfile = () => {
               )}
             </div>
           </div>
-          {!editing && (
+          {!editing && !isReadonlyView && (
             <button
               onClick={() => setEditing(true)}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-semibold text-sm hover:bg-indigo-100 transition-all"

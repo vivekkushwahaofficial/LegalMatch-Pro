@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
 import { MessageCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
+import InitialsAvatar from "../shared/InitialsAvatar";
 
 export default function MatchCard({ profile, onAccept, onReject }) {
+  const providerId = profile.providerId || profile.matchedUserId;
+  const providerRole = String(profile.providerType || profile.role || "").toUpperCase();
+  const profilePath = providerId
+    ? (providerRole === "NGO" ? `/ngo/${providerId}` : `/lawyer-profile/${providerId}`)
+    : null;
 
   const getStatusConfig = (status) => {
     switch (status) {
@@ -47,10 +53,11 @@ export default function MatchCard({ profile, onAccept, onReject }) {
       {/* Profile Header */}
       <div className="flex items-center gap-4 mb-5">
         <div className="relative">
-          <img
-            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`}
-            alt="profile"
-            className="w-14 h-14 rounded-full border-2 border-blue-100 p-0.5"
+          <InitialsAvatar
+            name={profile.name}
+            size={56}
+            className="border-2 border-blue-100 bg-blue-50 text-blue-700"
+            textClassName="text-sm"
           />
           {(profile.status === "APPROVED" || profile.status === "ACCEPTED") && (
             <div className="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white w-4 h-4 rounded-full"></div>
@@ -113,11 +120,17 @@ export default function MatchCard({ profile, onAccept, onReject }) {
           </button>
         )}
 
-        <Link to={`/lawyer-profile/${profile.id}`} className="block w-full text-center">
-          <span className="text-xs font-bold text-gray-400 hover:text-blue-500 uppercase tracking-widest transition-colors cursor-pointer block mt-2">
-            View full credentials
+        {profilePath ? (
+          <Link to={profilePath} className="block w-full text-center">
+            <span className="text-xs font-bold text-gray-400 hover:text-blue-500 uppercase tracking-widest transition-colors cursor-pointer block mt-2">
+              View full credentials
+            </span>
+          </Link>
+        ) : (
+          <span className="text-xs font-bold text-gray-300 uppercase tracking-widest block mt-2 text-center">
+            Profile unavailable
           </span>
-        </Link>
+        )}
       </div>
 
     </div>

@@ -17,4 +17,6 @@ public interface CaseRepository extends JpaRepository<Case, Long> {
     // Find cases by status (for admin search)
     List<Case> findByStatus(String status);
 
+    long countByStatusIgnoreCase(String status);
+
 }

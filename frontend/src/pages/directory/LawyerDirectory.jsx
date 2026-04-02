@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, MapPin, Scale, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { apiCall } from '../../api/apiConfig';
+import DirectoryCard from '../../components/shared/DirectoryCard';
+import FilterPanel from '../../components/shared/FilterPanel';
+import EmptyState from '../../components/shared/EmptyState';
+import ErrorState from '../../components/shared/ErrorState';
 
 const LawyerDirectory = () => {
   const [lawyers, setLawyers] = useState([]);
@@ -13,23 +16,34 @@ const LawyerDirectory = () => {
   const [sortDir, setSortDir] = useState('asc');
   const [page, setPage] = useState(0);
   const [size] = useState(12);
+  const [error, setError] = useState('');
+  const [debouncedLocation, setDebouncedLocation] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLocation(location.trim());
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [location]);
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (expertise.trim()) params.set('expertise', expertise.trim());
-    if (location.trim()) params.set('location', location.trim());
+    if (debouncedLocation) params.set('location', debouncedLocation);
     if (verified !== '') params.set('verified', verified);
     params.set('sortBy', sortBy);
     params.set('sortDir', sortDir);
     params.set('page', String(page));
     params.set('size', String(size));
     return params.toString();
-  }, [expertise, location, verified, sortBy, sortDir, page, size]);
+  }, [expertise, debouncedLocation, verified, sortBy, sortDir, page, size]);
 
   useEffect(() => {
     let isActive = true;
     const fetchLawyers = async () => {
       setLoading(true);
+      setError('');
       try {
         const response = await apiCall(`/directory/lawyers?${queryString}`, 'GET');
         if (isActive) {
@@ -51,6 +65,7 @@ const LawyerDirectory = () => {
         console.error('Error fetching lawyers:', error);
         if (isActive) {
           setLawyers([]);
+          setError('Unable to load lawyer directory right now.');
         }
       } finally {
         if (isActive) {
@@ -73,7 +88,7 @@ const LawyerDirectory = () => {
         </div>
 
         {/* Filters kept lightweight to preserve existing page design. */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 w-full lg:max-w-5xl">
+        <FilterPanel>
           <div className="relative lg:col-span-2">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <select
@@ -137,8 +152,10 @@ const LawyerDirectory = () => {
             <option value="location:asc">Location A-Z</option>
             <option value="verified:desc">Verified First</option>
           </select>
-        </div>
+        </FilterPanel>
       </div>
+
+      {error && <ErrorState message={error} className="mb-6" />}
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -150,48 +167,23 @@ const LawyerDirectory = () => {
             {lawyers.map((lawyer, index) => {
               const key = lawyer.id ?? `${lawyer.name}-${lawyer.specialization}-${lawyer.location}-${index}`;
               const lawyerId = lawyer.userId || lawyer.id;
+              const profileUrl = lawyerId ? `/lawyer/${lawyerId}` : null;
               return (
-                <div key={key} className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
-                      <Scale size={32} />
-                    </div>
-                    {lawyer.verified && (
-                      <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold ring-1 ring-green-100">
-                        <ShieldCheck size={14} /> VERIFIED
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{lawyer.name || "Unnamed Lawyer"}</h3>
-                  <p className="text-indigo-600 font-bold text-sm uppercase tracking-wider mb-6">{lawyer.specialization || "Lawyer"}</p>
-
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center gap-3 text-gray-500 font-medium">
-                      <MapPin size={18} className="text-gray-400" />
-                      {lawyer.location || "—"}
-                    </div>
-                    <div className="text-sm text-gray-400 italic">
-                      {lawyer.organizationDetails || "No additional details available."}
-                    </div>
-                  </div>
-
-                  <Link
-                    to={lawyerId ? `/lawyer/${lawyerId}` : "#"}
-                    onClick={(e) => {
-                      if (!lawyerId) e.preventDefault();
-                    }}
-                    aria-disabled={!lawyerId}
-                    className="block w-full py-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-indigo-600 hover:text-white transition-all text-center"
-                  >
-                    View Profile
-                  </Link>
-                </div>
+                <DirectoryCard
+                  key={key}
+                  title={lawyer.name || 'Unnamed Lawyer'}
+                  subtitle={lawyer.specialization || 'Lawyer'}
+                  location={lawyer.location}
+                  details={lawyer.organizationDetails}
+                  verified={lawyer.verified}
+                  profileUrl={profileUrl}
+                  ctaLabel="View Profile"
+                  accent="indigo"
+                />
               );
             })}
             {lawyers.length === 0 && (
-              <div className="col-span-full text-center py-20 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
-                <p className="text-gray-400 font-medium">No lawyers matched your filters.</p>
-              </div>
+              <EmptyState title="No lawyers found" message="No lawyers matched your filters." />
             )}
           </div>
 

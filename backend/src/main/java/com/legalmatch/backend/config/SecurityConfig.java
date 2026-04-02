@@ -52,6 +52,8 @@ public class SecurityConfig {
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/analytics/**").hasRole("ADMIN")
+                .requestMatchers("/analytics/**").hasRole("ADMIN")
                 // Authenticated users
                 .requestMatchers(HttpMethod.POST, "/api/cases", "/cases").hasRole("CITIZEN")
                 .requestMatchers(HttpMethod.GET, "/api/cases/my", "/cases/my").hasRole("CITIZEN")
