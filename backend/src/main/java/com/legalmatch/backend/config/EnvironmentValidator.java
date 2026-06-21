@@ -27,8 +27,8 @@ public class EnvironmentValidator {
         if ("prod".equalsIgnoreCase(activeProfile)) {
             log.info("EnvironmentValidator: Validating production configuration variables...");
             
-            if (!StringUtils.hasText(dbPassword) || "changeme".equalsIgnoreCase(dbPassword) || "0105cs243d21".equalsIgnoreCase(dbPassword)) {
-                log.error("CRITICAL ERROR: spring.datasource.password is empty, or using default placeholder ('changeme' / '0105cs243d21') in production!");
+            if (!StringUtils.hasText(dbPassword) || "changeme".equalsIgnoreCase(dbPassword)) {
+                log.error("CRITICAL ERROR: spring.datasource.password is empty, or using default placeholder ('changeme') in production!");
                 throw new IllegalStateException("CRITICAL STARTUP ERROR: Secure database password (SPRING_DATASOURCE_PASSWORD) must be configured in production profile!");
             }
 
