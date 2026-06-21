@@ -71,6 +71,10 @@ backend_logs_docker_err.txt
 frontend/.env.local
 frontend/.env.production.local
 
+# Backend properties files
+backend/src/main/resources/application-dev.properties
+backend/src/main/resources/application-prod.properties
+
 
 # OS files
 $RECYCLE.BIN/
