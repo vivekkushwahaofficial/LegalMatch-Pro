@@ -151,7 +151,7 @@ The PostgreSQL database contains the following tables mapped using JPA/Hibernate
 erDiagram
     users {
         bigint id PK
-        varchar email UNIQUE
+        varchar email
         varchar name
         varchar password
         varchar role
