@@ -147,7 +147,7 @@ export default function Matching() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <aside className="w-full lg:w-80 lg:shrink-0">
           <Filters

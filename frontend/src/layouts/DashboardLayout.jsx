@@ -57,9 +57,9 @@ const DashboardLayout = ({ role }) => {
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white">
 
-        <header className="h-16 flex items-center justify-end px-8 border-b border-slate-100 shrink-0">
+        <header className="h-14 sm:h-16 flex items-center justify-between pl-14 md:pl-6 pr-4 sm:pr-8 border-b border-slate-100 shrink-0">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 ml-auto">
 
             {/* ✅ Notification */}
             <NotificationPanel />
@@ -111,7 +111,7 @@ const DashboardLayout = ({ role }) => {
 
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
 

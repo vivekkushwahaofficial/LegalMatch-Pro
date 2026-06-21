@@ -5,7 +5,7 @@ const CitizenDashboard = () => {
         <div className="p-6 max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
             <p className="text-gray-500 mb-8 font-medium italic">Empowering your legal journey with data-driven aid.</p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Link to="/citizen/submit-case" className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Submit New Case</h3>

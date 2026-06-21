@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Users, Briefcase, Building2, ArrowRight, Scale, Heart, CheckCircle } from 'lucide-react';
+import { Shield, Users, Briefcase, Building2, ArrowRight, Scale, Heart, CheckCircle, Menu, X } from 'lucide-react';
 
 const LandingPage = () => {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
             <header className="border-b border-gray-100 sticky top-0 bg-white/80 backdrop-blur-md z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-20">
+                    <div className="flex items-center justify-between h-16 sm:h-20">
                         <div className="flex items-center gap-2">
-                            <Shield className="text-indigo-600" size={32} />
-                            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+                            <Shield className="text-indigo-600" size={28} />
+                            <span className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
                                 LegalMatch Pro
                             </span>
                         </div>
+                        {/* Desktop nav */}
                         <nav className="hidden md:flex items-center gap-8">
                             <a href="#features" className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Features</a>
                             <a href="#about" className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">About Us</a>
@@ -25,17 +27,36 @@ const LandingPage = () => {
                                 Get Started
                             </Link>
                         </nav>
+                        {/* Mobile menu button */}
+                        <button
+                            className="md:hidden p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                            onClick={() => setMobileMenuOpen(prev => !prev)}
+                            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                        >
+                            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                        </button>
                     </div>
+                    {/* Mobile dropdown nav */}
+                    {mobileMenuOpen && (
+                        <div className="md:hidden border-t border-gray-100 py-4 flex flex-col gap-4">
+                            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors px-2">Features</a>
+                            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors px-2">About Us</a>
+                            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors px-2">Sign In</Link>
+                            <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="bg-indigo-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-indigo-700 transition-all text-center">
+                                Get Started
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </header>
 
             <main>
                 {/* Hero Section */}
-                <section className="relative pt-20 pb-32 overflow-hidden">
+                <section className="relative pt-10 pb-16 sm:pb-20 overflow-hidden">
                     <div className="absolute top-0 right-0 -z-10 w-1/2 h-full bg-gradient-to-b from-indigo-50/50 to-transparent rounded-bl-[100px]"></div>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-8">
+                        <div className="grid lg:grid-cols-2 gap-8 items-center">
+                            <div className="space-y-6">
                                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold">
                                     <span className="relative flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
@@ -43,7 +64,7 @@ const LandingPage = () => {
                                     </span>
                                     Empowering Access to Justice
                                 </div>
-                                <h1 className="text-5xl lg:text-6xl font-extrabold text-gray-900 leading-[1.1]">
+                                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-gray-900 leading-[1.1]">
                                     Bridging the Gap Between <span className="text-indigo-600">Legal Expertise</span> and Those in Need.
                                 </h1>
                                 <p className="text-xl text-gray-600 leading-relaxed max-w-xl">
@@ -97,20 +118,20 @@ const LandingPage = () => {
                 </section>
 
                 {/* Roles Section */}
-                <section id="features" className="py-24 bg-gray-50/50">
+                <section id="features" className="py-12 sm:py-16 bg-gray-50/50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                        <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
                             <h2 className="text-indigo-600 font-bold tracking-wider uppercase text-sm">Our Ecosystem</h2>
                             <h3 className="text-4xl font-bold text-gray-900">Tailored Experience for Every Stakeholder</h3>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-8">
+                        <div className="grid md:grid-cols-3 gap-6">
                             {/* Citizen Card */}
-                            <div className="bg-white p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100">
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                                    <Users size={32} />
+                            <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100">
+                                <div className="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                    <Users size={28} />
                                 </div>
-                                <h4 className="text-2xl font-bold text-gray-900 mb-4">Citizens</h4>
-                                <p className="text-gray-600 leading-relaxed mb-6">
+                                <h4 className="text-2xl font-bold text-gray-900 mb-2">Citizens</h4>
+                                <p className="text-gray-600 leading-relaxed mb-4">
                                     Submit your legal challenges and get matched with specialized lawyers and NGOs ready to support your cause.
                                 </p>
                                 <ul className="space-y-3">
@@ -124,12 +145,12 @@ const LandingPage = () => {
                             </div>
 
                             {/* Lawyer Card */}
-                            <div className="bg-white p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100 ring-4 ring-indigo-50 ring-offset-0">
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-200">
-                                    <Scale size={32} />
+                            <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100 ring-4 ring-indigo-50 ring-offset-0">
+                                <div className="w-14 h-14 rounded-xl bg-indigo-600 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-200">
+                                    <Scale size={28} />
                                 </div>
-                                <h4 className="text-2xl font-bold text-gray-900 mb-4">Lawyers</h4>
-                                <p className="text-gray-600 leading-relaxed mb-6">
+                                <h4 className="text-2xl font-bold text-gray-900 mb-2">Lawyers</h4>
+                                <p className="text-gray-600 leading-relaxed mb-4">
                                     Provide pro-bono expertise and manage your assigned cases through our intuitive professional dashboard.
                                 </p>
                                 <ul className="space-y-3">
@@ -143,12 +164,12 @@ const LandingPage = () => {
                             </div>
 
                             {/* NGO Card */}
-                            <div className="bg-white p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100">
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                                    <Building2 size={32} />
+                            <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group border border-gray-100">
+                                <div className="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                    <Building2 size={28} />
                                 </div>
-                                <h4 className="text-2xl font-bold text-gray-900 mb-4">NGOs</h4>
-                                <p className="text-gray-600 leading-relaxed mb-6">
+                                <h4 className="text-2xl font-bold text-gray-900 mb-2">NGOs</h4>
+                                <p className="text-gray-600 leading-relaxed mb-4">
                                     Collaborate on large-scale legal aid projects and connect multiple beneficiaries to our vast network of experts.
                                 </p>
                                 <ul className="space-y-3">
@@ -166,9 +187,9 @@ const LandingPage = () => {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white border-t border-gray-100 pt-20 pb-10">
+            <footer className="bg-white border-t border-gray-100 pt-12 pb-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                         <div className="col-span-2 space-y-6">
                             <div className="flex items-center gap-2">
                                 <Shield className="text-indigo-600" size={28} />
@@ -186,7 +207,7 @@ const LandingPage = () => {
                             </div>
                         </div>
                         <div>
-                            <h5 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Platform</h5>
+                            <h5 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Platform</h5>
                             <ul className="space-y-4 text-sm text-gray-500">
                                 <li><a href="#" className="hover:text-indigo-600 transition-colors">Directory</a></li>
                                 <li><a href="#" className="hover:text-indigo-600 transition-colors">How it Works</a></li>
@@ -194,7 +215,7 @@ const LandingPage = () => {
                             </ul>
                         </div>
                         <div>
-                            <h5 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Company</h5>
+                            <h5 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Company</h5>
                             <ul className="space-y-4 text-sm text-gray-500">
                                 <li><a href="#" className="hover:text-indigo-600 transition-colors">About Us</a></li>
                                 <li><a href="#" className="hover:text-indigo-600 transition-colors">Partners</a></li>
@@ -202,7 +223,7 @@ const LandingPage = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="border-t border-gray-50 pt-8 flex flex-col md:row items-center justify-between gap-4">
+                    <div className="border-t border-gray-50 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-xs text-gray-400">
                             © 2024 LegalMatch Pro. All rights reserved. Built with empathy for the legal community.
                         </p>

@@ -10,7 +10,7 @@ const ConversationList = ({ conversations, onSelectChat, selectedMatch }) => {
   );
 
   return (
-    <div className="w-96 border-r border-gray-100 bg-white flex flex-col h-full">
+    <div className="w-full md:w-96 border-r border-gray-100 bg-white flex flex-col h-full">
       {/* Header */}
       <div className="p-6 border-b border-gray-50 flex items-center justify-between">
         <h2 className="text-2xl font-black text-gray-900 tracking-tight">Messages</h2>

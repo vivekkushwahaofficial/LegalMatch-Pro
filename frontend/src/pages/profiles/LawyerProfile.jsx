@@ -86,11 +86,11 @@ const LawyerProfile = () => {
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8">
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
           <div className="flex items-center gap-5">
             <div className="w-20 h-20 rounded-2xl bg-indigo-50 flex items-center justify-center">
               <Scale size={36} className="text-indigo-600" />

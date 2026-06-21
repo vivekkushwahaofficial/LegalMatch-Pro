@@ -37,7 +37,7 @@ const LawyerDashboard = () => {
         const appts = await apiCall("/appointments/my", "GET");
         const apptList = Array.isArray(appts) ? appts : [];
         setStats((prev) => ({ ...prev, appointments: apptList.length }));
-      } catch (_) {}
+      } catch (_) { }
 
     } catch (error) {
       console.error("Failed to load dashboard data", error);
@@ -165,7 +165,7 @@ const LawyerDashboard = () => {
             {requests.map((req) => (
               <div
                 key={req.matchId}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gray-50 rounded-xl"
               >
                 <div>
                   <p className="font-semibold text-gray-900">{req.caseTitle}</p>
@@ -173,7 +173,7 @@ const LawyerDashboard = () => {
                     New case match request
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <button
                     onClick={() => actOnRequest(req.matchId, true)}
                     className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 transition-all"

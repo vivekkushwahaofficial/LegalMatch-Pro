@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { apiCall, getValidAccessToken } from "../../api/apiConfig";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
-import { MessageCircle, Send, MoreHorizontal, Info } from "lucide-react";
+import { MessageCircle, Send, MoreHorizontal, Info, ArrowLeft } from "lucide-react";
 import InitialsAvatar from "../shared/InitialsAvatar";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-const ChatWindow = ({ match }) => {
+const ChatWindow = ({ match, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
@@ -119,6 +119,15 @@ const ChatWindow = ({ match }) => {
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-4">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-1 hover:bg-gray-100 rounded-full md:hidden text-gray-500 mr-1"
+              aria-label="Back to conversations"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
           <div className="relative">
             <InitialsAvatar
               name={match.providerName || match.matchedUserName}

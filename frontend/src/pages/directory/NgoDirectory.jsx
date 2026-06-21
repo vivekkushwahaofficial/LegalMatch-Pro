@@ -80,10 +80,10 @@ const NgoDirectory = () => {
   }, [queryString]);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 mb-2 italic">NGO DIRECTORY</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-2 italic">NGO DIRECTORY</h1>
           <p className="text-gray-500 font-medium">Find and collaborate with impact-driven NGOs nationwide.</p>
         </div>
 
@@ -153,7 +153,7 @@ const NgoDirectory = () => {
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {ngos.map((ngo, index) => {
               const ngoId = ngo.userId || ngo.id;
               const profileUrl = ngoId ? `/ngo/${ngoId}` : null;

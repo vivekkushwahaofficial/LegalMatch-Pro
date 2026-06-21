@@ -16,7 +16,7 @@ const DirectoryCard = ({
   const hasUrl = Boolean(profileUrl);
 
   return (
-    <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
+    <div className="bg-white rounded-[32px] sm:rounded-[40px] border border-gray-100 p-6 sm:p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all group">
       <div className="flex items-start justify-between mb-6">
         <InitialsAvatar
           name={title}

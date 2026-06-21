@@ -37,7 +37,7 @@ const RequestsInbox = () => {
   if (loading) return <div className="p-8 text-center text-gray-500 text-lg">Loading requests...</div>;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto min-h-screen bg-gray-50">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto min-h-screen bg-gray-50">
       <h1 className="text-3xl font-bold mb-8 text-gray-800 flex items-center gap-3">
         <MessageSquare className="w-8 h-8 text-blue-600" />
         Connection Requests
@@ -54,8 +54,8 @@ const RequestsInbox = () => {
         <div className="grid gap-6">
           {requests.map((req) => (
             <div key={req.matchId} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div className="space-y-3">
+              <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
+                <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                       {req.matchedUserName?.charAt(0) || "U"}
@@ -84,17 +84,17 @@ const RequestsInbox = () => {
                   )}
                 </div>
 
-                <div className="flex gap-3 ml-4">
+                <div className="flex gap-3 w-full md:w-auto justify-start md:justify-end shrink-0">
                   <button
                     onClick={() => handleAction(req.matchId, true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-full font-bold hover:bg-blue-700 transition-colors shadow-sm"
+                    className="flex flex-1 md:flex-none items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-full font-bold hover:bg-blue-700 transition-colors shadow-sm"
                   >
                     <Check className="w-5 h-5" />
                     Accept
                   </button>
                   <button
                     onClick={() => handleAction(req.matchId, false)}
-                    className="flex items-center gap-2 bg-white text-gray-700 border border-gray-200 px-5 py-2.5 rounded-full font-bold hover:bg-gray-50 transition-colors shadow-sm"
+                    className="flex flex-1 md:flex-none items-center justify-center gap-2 bg-white text-gray-700 border border-gray-200 px-5 py-2.5 rounded-full font-bold hover:bg-gray-50 transition-colors shadow-sm"
                   >
                     <X className="w-5 h-5" />
                     Decline

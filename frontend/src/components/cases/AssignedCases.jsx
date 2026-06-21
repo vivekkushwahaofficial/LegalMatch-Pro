@@ -35,7 +35,7 @@ export default function AssignedCases() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
         <Briefcase size={24} className="text-indigo-600" />
         Assigned Cases
