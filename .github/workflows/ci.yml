@@ -10,6 +10,20 @@ jobs:
   backend-test:
     name: Backend Test & Build
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: legalmatch_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: secureDBpass2026!
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -22,6 +36,12 @@ jobs:
           cache: 'maven'
 
       - name: Build and Test Backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/legalmatch_db
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: secureDBpass2026!
+          JWT_SECRET: prod-grade-super-secure-jwt-secret-key-32-chars-minimum
+          SPRING_PROFILES_ACTIVE: dev
         run: |
           cd backend
           mvn clean test
