@@ -53,7 +53,7 @@ export default function NGODashboard() {
   };
 
   return (
-    <div>
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-semibold mb-6">
         NGO Dashboard
       </h1>
@@ -66,7 +66,7 @@ export default function NGODashboard() {
       {cases.length === 0 ? (
         <p>No pending case requests right now.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
           {cases.map((c) => (
             <div
@@ -82,18 +82,18 @@ export default function NGODashboard() {
                 Status: <b>{c.matchStatus}</b>
               </p>
 
-              <div className="flex gap-2">
-                <div className="flex gap-2 mb-2">
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
                   <button
                     onClick={() => handleAccept(c.matchId)}
-                    className="flex-1 bg-green-500 text-white py-1 rounded"
+                    className="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
                   >
                     Accept
                   </button>
 
                   <button
                     onClick={() => handleReject(c.matchId)}
-                    className="flex-1 bg-red-500 text-white py-1 rounded"
+                    className="flex-1 bg-red-500 text-white py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
                   >
                     Reject
                   </button>
@@ -101,7 +101,7 @@ export default function NGODashboard() {
 
                 <button
                   onClick={() => alert(c.caseTitle)}
-                  className="w-full bg-blue-500 text-white py-1 rounded"
+                  className="w-full bg-blue-500 text-white py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
                 >
                   View Details
                 </button>

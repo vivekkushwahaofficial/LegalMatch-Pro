@@ -26,9 +26,9 @@
 ## 📸 Screenshots
 
 ### Landing Page & Authentication
-| Landing Page | Login |
+| Landing Page | Login (Redesigned) |
 | :---: | :---: |
-| ![Landing Page Placeholder](https://placehold.co/600x400?text=Landing+Page+Dashboard) | ![Login Placeholder](https://placehold.co/600x400?text=Login+Portal) |
+| ![Landing Page](screenshots/landing_page.png) | ![Login Portal](screenshots/login_redesign.png) |
 
 ### Role Dashboards
 | Citizen Dashboard | Lawyer Dashboard |

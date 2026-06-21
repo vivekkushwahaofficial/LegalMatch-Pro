@@ -78,21 +78,23 @@ const ChatPage = () => {
 
       {/* LEFT SIDE */}
       {conversations.length === 0 ? (
-        <div className="w-1/3 flex items-center justify-center text-gray-400">
+        <div className="w-full md:w-1/3 flex items-center justify-center text-gray-400">
           No approved chats available
         </div>
       ) : (
-        <ConversationList
-          conversations={conversations}
-          onSelectChat={setSelectedChat}
-          selectedMatch={selectedChat}
-        />
+        <div className={`w-full md:w-auto shrink-0 ${selectedChat ? "hidden md:block" : "block"}`}>
+          <ConversationList
+            conversations={conversations}
+            onSelectChat={setSelectedChat}
+            selectedMatch={selectedChat}
+          />
+        </div>
       )}
 
       {/* RIGHT SIDE */}
-      <div className="flex-1 overflow-hidden">
+      <div className={`flex-1 overflow-hidden h-full ${!selectedChat ? "hidden md:block" : "block"}`}>
         {selectedChat ? (
-          <ChatWindow match={selectedChat} />
+          <ChatWindow match={selectedChat} onBack={() => setSelectedChat(null)} />
         ) : (
           <div className="h-full flex flex-col items-center justify-center bg-[#fafafa] p-12 text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">

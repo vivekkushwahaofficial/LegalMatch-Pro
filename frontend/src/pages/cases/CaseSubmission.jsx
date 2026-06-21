@@ -167,7 +167,7 @@ const CaseSubmission = () => {
 
   if (submitted && submittedCase) {
     return (
-      <div className="max-w-3xl mx-auto py-10">
+      <div className="max-w-3xl mx-auto p-4 sm:p-6 py-10">
 
         {/* Success Header */}
         <div className="text-center mb-8">
@@ -280,15 +280,15 @@ const CaseSubmission = () => {
 
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
-      <div className="flex justify-between items-start mb-6">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto pb-10">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Case Submission</h1>
           <p className="text-gray-500 text-sm">Fill in the necessary details to submit your case.</p>
         </div>
         <button
           onClick={() => navigate("/citizen/cases")}
-          className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+          className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap w-full sm:w-auto text-center"
         >
           📂 View Previous Cases
         </button>

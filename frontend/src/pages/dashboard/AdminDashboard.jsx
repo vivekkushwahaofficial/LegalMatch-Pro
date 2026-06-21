@@ -66,27 +66,27 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 overflow-x-auto whitespace-nowrap scrollbar-none">
         <button
-          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 ${activeTab === 'userVerification' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 shrink-0 ${activeTab === 'userVerification' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('userVerification')}
         >
           User Verification
         </button>
         <button
-          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 ${activeTab === 'directory' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 shrink-0 ${activeTab === 'directory' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('directory')}
         >
           Directory Ingestion
         </button>
         <button
-          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 ${activeTab === 'logs' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 shrink-0 ${activeTab === 'logs' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('logs')}
         >
           System Logs
         </button>
         <button
-          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 ${activeTab === 'settings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`pb-4 px-6 text-sm font-medium transition-colors border-b-2 shrink-0 ${activeTab === 'settings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('settings')}
         >
           App Settings
@@ -97,16 +97,16 @@ const AdminDashboard = () => {
       {activeTab === 'userVerification' && (
         <div className="bg-white rounded-lg border border-slate-100 shadow-sm">
           {/* Access Control / Search Bar */}
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-slate-50/50">
             <div>
               <h3 className="font-semibold text-slate-900">User Verification Queue</h3>
               <p className="text-sm text-slate-500 mt-1">Review and approve/reject profiles for Lawyers and NGOs.</p>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Search users..."
-                className="pl-4 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                className="pl-4 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
               />
             </div>
           </div>

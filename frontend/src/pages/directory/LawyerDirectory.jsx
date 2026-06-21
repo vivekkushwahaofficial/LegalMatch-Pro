@@ -80,10 +80,10 @@ const LawyerDirectory = () => {
   }, [queryString]);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 mb-2 italic">LAWYER DIRECTORY</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-2 italic">LAWYER DIRECTORY</h1>
           <p className="text-gray-500 font-medium">Connect with verified legal professionals across the country.</p>
         </div>
 
@@ -163,7 +163,7 @@ const LawyerDirectory = () => {
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {lawyers.map((lawyer, index) => {
               const key = lawyer.id ?? `${lawyer.name}-${lawyer.specialization}-${lawyer.location}-${index}`;
               const lawyerId = lawyer.userId || lawyer.id;

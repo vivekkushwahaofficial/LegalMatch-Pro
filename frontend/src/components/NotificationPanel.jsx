@@ -121,7 +121,7 @@ const NotificationPanel = () => {
       {/* Dropdown */}
       {open && (
 
-        <div className="absolute right-0 mt-3 w-96 bg-white shadow-xl rounded-2xl border border-slate-100 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-3 w-80 sm:w-96 max-w-[calc(100vw-1rem)] bg-white shadow-xl rounded-2xl border border-slate-100 z-50 overflow-hidden">
 
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <div className="font-semibold text-slate-900">Notifications</div>
