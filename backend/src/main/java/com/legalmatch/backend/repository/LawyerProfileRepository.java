@@ -21,4 +21,16 @@ public interface LawyerProfileRepository extends JpaRepository<LawyerProfile, Lo
             String specialization,
             String location
     );
+
+    List<LawyerProfile> findBySpecializationIgnoreCaseAndLocationIgnoreCaseAndVerified(
+            String specialization,
+            String location,
+            boolean verified
+    );
+
+    List<LawyerProfile> findBySpecializationIgnoreCaseAndVerified(String specialization, boolean verified);
+
+    List<LawyerProfile> findByLocationIgnoreCaseAndVerified(String location, boolean verified);
+
+    List<LawyerProfile> findByVerified(boolean verified);
 }

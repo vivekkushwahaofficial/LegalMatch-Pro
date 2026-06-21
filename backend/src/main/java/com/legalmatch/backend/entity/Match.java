@@ -21,11 +21,11 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long matchId;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "case_id", nullable = false)
     private Case legalCase;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User matchedUser;
 

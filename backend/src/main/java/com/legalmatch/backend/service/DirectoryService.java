@@ -63,16 +63,21 @@ public class DirectoryService {
 
     public List<LawyerProfile> searchLawyers(String specialization, String location, Boolean verified) {
         if (specialization != null && location != null) {
-            List<LawyerProfile> results = lawyerProfileRepository.findBySpecializationIgnoreCaseAndLocationIgnoreCase(specialization, location);
-            return filterLawyersByVerified(results, verified);
+            return (verified != null)
+                ? lawyerProfileRepository.findBySpecializationIgnoreCaseAndLocationIgnoreCaseAndVerified(specialization, location, verified)
+                : lawyerProfileRepository.findBySpecializationIgnoreCaseAndLocationIgnoreCase(specialization, location);
         } else if (specialization != null) {
-            List<LawyerProfile> results = lawyerProfileRepository.findBySpecializationIgnoreCase(specialization);
-            return filterLawyersByVerified(results, verified);
+            return (verified != null)
+                ? lawyerProfileRepository.findBySpecializationIgnoreCaseAndVerified(specialization, verified)
+                : lawyerProfileRepository.findBySpecializationIgnoreCase(specialization);
         } else if (location != null) {
-            List<LawyerProfile> results = lawyerProfileRepository.findByLocationIgnoreCase(location);
-            return filterLawyersByVerified(results, verified);
+            return (verified != null)
+                ? lawyerProfileRepository.findByLocationIgnoreCaseAndVerified(location, verified)
+                : lawyerProfileRepository.findByLocationIgnoreCase(location);
         }
-        return filterLawyersByVerified(lawyerProfileRepository.findAll(), verified);
+        return (verified != null)
+            ? lawyerProfileRepository.findByVerified(verified)
+            : lawyerProfileRepository.findAll();
     }
 
     public List<NgoProfile> getNgos(String location) {
@@ -81,10 +86,13 @@ public class DirectoryService {
 
     public List<NgoProfile> getNgos(String location, Boolean verified) {
         if (location != null) {
-            List<NgoProfile> results = ngoProfileRepository.findByLocationIgnoreCase(location);
-            return filterNgosByVerified(results, verified);
+            return (verified != null)
+                ? ngoProfileRepository.findByLocationIgnoreCaseAndVerified(location, verified)
+                : ngoProfileRepository.findByLocationIgnoreCase(location);
         }
-        return filterNgosByVerified(ngoProfileRepository.findAll(), verified);
+        return (verified != null)
+            ? ngoProfileRepository.findByVerified(verified)
+            : ngoProfileRepository.findAll();
     }
 
     public List<LawyerDirectory> getAllDirectoryLawyers() {

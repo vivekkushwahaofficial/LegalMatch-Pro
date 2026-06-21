@@ -50,10 +50,7 @@ class DirectoryServiceFilterTest {
         LawyerProfile verified = new LawyerProfile();
         verified.setVerified(true);
 
-        LawyerProfile unverified = new LawyerProfile();
-        unverified.setVerified(false);
-
-        when(lawyerProfileRepository.findAll()).thenReturn(List.of(verified, unverified));
+        when(lawyerProfileRepository.findByVerified(true)).thenReturn(List.of(verified));
 
         List<LawyerProfile> result = directoryService.searchLawyers(null, null, true);
         assertEquals(1, result.size());
@@ -62,13 +59,10 @@ class DirectoryServiceFilterTest {
 
     @Test
     void getNgos_filtersByVerifiedWhenProvided() {
-        NgoProfile verified = new NgoProfile();
-        verified.setVerified(true);
-
         NgoProfile unverified = new NgoProfile();
         unverified.setVerified(false);
 
-        when(ngoProfileRepository.findAll()).thenReturn(List.of(verified, unverified));
+        when(ngoProfileRepository.findByVerified(false)).thenReturn(List.of(unverified));
 
         List<NgoProfile> result = directoryService.getNgos(null, false);
         assertEquals(1, result.size());

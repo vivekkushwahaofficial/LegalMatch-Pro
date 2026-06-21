@@ -30,6 +30,9 @@ public class JwtService {
 
     @PostConstruct
     void init() {
+        if (secretKey == null || secretKey.isBlank() || secretKey.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET must be set and at least 32 characters long");
+        }
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 

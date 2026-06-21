@@ -117,8 +117,11 @@ public class AnalyticsService {
 
     private List<Map<String, Object>> buildUserGrowthTrend() {
         Map<YearMonth, Long> buckets = initializeMonthBuckets(6);
-        for (User user : userRepository.findAll()) {
-            LocalDateTime submitted = user.getSubmittedDate();
+        YearMonth earliest = YearMonth.now().minusMonths(5);
+        LocalDateTime start = earliest.atDay(1).atStartOfDay();
+        LocalDateTime end = LocalDateTime.now();
+
+        for (LocalDateTime submitted : userRepository.findSubmittedDatesBetween(start, end)) {
             if (submitted == null) {
                 continue;
             }
@@ -140,8 +143,11 @@ public class AnalyticsService {
 
     private List<Map<String, Object>> buildCaseGrowthTrend() {
         Map<YearMonth, Long> buckets = initializeMonthBuckets(6);
-        for (Case legalCase : caseRepository.findAll()) {
-            LocalDateTime created = legalCase.getCreatedAt();
+        YearMonth earliest = YearMonth.now().minusMonths(5);
+        LocalDateTime start = earliest.atDay(1).atStartOfDay();
+        LocalDateTime end = LocalDateTime.now();
+
+        for (LocalDateTime created : caseRepository.findCreatedAtBetween(start, end)) {
             if (created == null) {
                 continue;
             }
@@ -162,8 +168,7 @@ public class AnalyticsService {
     }
 
     private List<Map<String, Object>> buildGeoCaseDistribution() {
-        Map<String, Long> grouped = caseRepository.findAll().stream()
-                .map(Case::getLocation)
+        Map<String, Long> grouped = caseRepository.findAllLocations().stream()
                 .map(location -> {
                     if (location == null || location.trim().isEmpty()) {
                         return "Not Provided";

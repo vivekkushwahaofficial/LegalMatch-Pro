@@ -189,8 +189,8 @@ public class AuthService {
         user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        // Simulate email sending by logging the reset token.
-        LOGGER.info("Password reset token for {} is {}", user.getEmail(), token);
+        // Simulate email sending by logging the reset link info.
+        LOGGER.info("Password reset link sent for user: {}", user.getEmail());
 
         return "Reset link sent";
     }

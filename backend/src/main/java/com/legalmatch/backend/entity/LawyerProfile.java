@@ -21,7 +21,7 @@ public class LawyerProfile {
 
     private boolean verified;
 
-    @OneToOne
+    @OneToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 

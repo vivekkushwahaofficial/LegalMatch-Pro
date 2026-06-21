@@ -16,7 +16,7 @@ public class NgoProfile {
     private String location;
     private boolean verified;
 
-    @OneToOne
+    @OneToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 

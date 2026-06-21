@@ -15,4 +15,6 @@ public interface NgoProfileRepository extends JpaRepository<NgoProfile, Long> {
 
     // Filter by location AND verification status
     List<NgoProfile> findByLocationIgnoreCaseAndVerified(String location, boolean verified);
+
+    List<NgoProfile> findByVerified(boolean verified);
 }
