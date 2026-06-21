@@ -26,9 +26,9 @@
 ## 📸 Screenshots
 
 ### Landing Page & Authentication
-| Landing Page | Login (Redesigned) | Register (Redesigned) |
-| :---: | :---: | :---: |
-| ![Landing Page](screenshots/landing_page.png) | ![Login Portal](screenshots/login_redesign.png) | ![Register Portal](screenshots/signup_redesign.png) |
+| Landing Page | Login (Redesigned) |
+| :---: | :---: |
+| ![Landing Page](screenshots/landing_page.png) | ![Login Portal](screenshots/login_redesign.png) |
 
 ### Role Dashboards
 | Citizen Dashboard | Lawyer Dashboard |
