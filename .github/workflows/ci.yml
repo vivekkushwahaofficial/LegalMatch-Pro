@@ -40,6 +40,10 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/legalmatch_db
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: secureDBpass2026!
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+          SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+          SPRING_FLYWAY_ENABLED: "true"
+          SPRING_JPA_HIBERNATE_DDL_AUTO: validate
           JWT_SECRET: prod-grade-super-secure-jwt-secret-key-32-chars-minimum
           SPRING_PROFILES_ACTIVE: dev
         run: |
